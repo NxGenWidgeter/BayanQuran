@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bayan — the verse, checked at the letter</title>
+<meta name="description" content="Pick any verse of the Quran and see it verified letter-for-letter against three published Uthmani editions.">
+<link rel="stylesheet" href="/static/style.css?v=__V__">
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">ب</span>
+      <div class="brand-text">
+        <h1>Bayan <span class="brand-ar">بيان</span></h1>
+        <p>Quran verses, checked at the letter</p>
+      </div>
+    </div>
+
+    <div class="search">
+      <input id="q" type="search" autocomplete="off" spellcheck="false"
+             placeholder="Search Arabic letters or an English / Malay translation…"
+             aria-label="Search the Quran">
+      <kbd>/</kbd>
+    </div>
+
+    <div class="top-actions">
+      <div class="seg" id="langSeg" role="group" aria-label="Translation language">
+        <button data-lang="en" class="on">EN</button>
+        <button data-lang="ms">MS</button>
+      </div>
+      <button id="randomBtn" class="ghost" title="Jump to a random verse">Random</button>
+      <button id="statusBtn" class="pill" title="Corpus integrity report">
+        <span class="dot ok"></span><span id="statusLabel">checking…</span>
+      </button>
+      <button id="themeBtn" class="icon" title="Light / dark" aria-label="Toggle theme">◐</button>
+    </div>
+  </header>
+
+  <div class="workspace" id="workspace">
+    <aside class="sidebar">
+      <div class="side-head">
+        <input id="surahFilter" type="search" placeholder="Filter surahs…" autocomplete="off" aria-label="Filter surahs">
+        <span class="count" id="surahCount"></span>
+      </div>
+      <nav id="surahList" class="surah-list" aria-label="Surahs"></nav>
+    </aside>
+
+    <main class="reader" id="reader">
+      <div class="reader-inner" id="readerInner">
+        <div class="empty">Loading the corpus…</div>
+      </div>
+    </main>
+
+    <aside class="inspector" id="inspector" aria-label="Verse verification" hidden>
+      <div class="insp-inner" id="inspInner"></div>
+    </aside>
+  </div>
+
+  <div class="modal" id="statusModal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="statusTitle">
+      <div class="modal-head">
+        <h2 id="statusTitle">How these verses are verified</h2>
+        <button class="icon" id="statusClose" aria-label="Close">✕</button>
+      </div>
+      <div id="statusBody" class="modal-body"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="/static/app.js?v=__V__"></script>
+</body>
+</html>
