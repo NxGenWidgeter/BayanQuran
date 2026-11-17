@@ -1,4 +1,4 @@
-/* Bayan static edition — the same /api contract, answered from exported JSON.
+/* BayanQuran static edition — the same /api contract, answered from exported JSON.
  *
  * export_static.py writes every endpoint's payload to data/. Nothing here is a
  * mock: the surah texts, the three source editions, the diffs, the consensus

@@ -1,4 +1,4 @@
-"""Text normalisation and cross-source comparison for Bayan.
+"""Text normalisation and cross-source comparison for BayanQuran.
 
 The Quran's Uthmani text is published by several independent projects. They agree
 on the consonants, but differ in how marks, tatweel, hamza carriers and word

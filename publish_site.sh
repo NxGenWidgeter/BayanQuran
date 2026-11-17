@@ -42,7 +42,7 @@ git init -q
 git checkout -q -b "$BRANCH"
 git add -A
 git -c user.name="$NAME" -c user.email="$EMAIL" \
-  commit -qm "Bayan $VERSION — static edition"
+  commit -qm "BayanQuran $VERSION — static edition"
 git push -q --force "$(git -C "$ROOT" remote get-url "$REMOTE")" "$BRANCH"
 
 echo "published $(find . -path ./.git -prune -o -type f -print | wc -l) files to $BRANCH"

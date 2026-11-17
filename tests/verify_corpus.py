@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Integrity harness for Bayan.
+"""Integrity harness for BayanQuran.
 
 Re-derives every claim the app makes from the database itself, then (unless
 --db-only) exercises the live HTTP API the browser talks to. Exit code is the

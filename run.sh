@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Bayan launcher.
+# BayanQuran launcher.
 #   ./run.sh          start the service in the foreground
 #   ./run.sh --open   start it in the background and open it in your browser
 #   ./run.sh --stop   stop whatever is listening on the port
@@ -32,7 +32,7 @@ if [ ! -x .venv/bin/python ]; then
 fi
 
 if curl -sf --max-time 2 "${URL}healthz" >/dev/null 2>&1; then
-  echo "Bayan already running at ${URL}"
+  echo "BayanQuran already running at ${URL}"
   if [ "$OPEN" = 1 ]; then
     xdg-open "${URL}" >/dev/null 2>&1 &
   fi
@@ -52,7 +52,7 @@ if [ "$OPEN" = 1 ]; then
     exit 1
   fi
   xdg-open "${URL}" >/dev/null 2>&1 &
-  echo "Bayan running at ${URL}"
+  echo "BayanQuran running at ${URL}"
   exit 0
 fi
 

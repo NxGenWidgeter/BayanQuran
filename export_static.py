@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Export Bayan as a static site: no server, no install, just files.
+"""Export BayanQuran as a static site: no server, no install, just files.
 
 The local app answers nine JSON endpoints by querying SQLite on every request.
 None of that data changes between builds, so the whole API can be written out
@@ -260,8 +260,8 @@ def write_manifest(out: Path) -> None:
     (out / "manifest.webmanifest").write_text(
         json.dumps(
             {
-                "name": "Bayan — Quran verses, checked at the letter",
-                "short_name": "Bayan",
+                "name": "BayanQuran — Quran verses, checked at the letter",
+                "short_name": "BayanQuran",
                 "start_url": "./",
                 "scope": "./",
                 "display": "standalone",
@@ -331,16 +331,16 @@ def main() -> int:
     (out / ".nojekyll").write_text("", encoding="utf-8")
     (out / "robots.txt").write_text("User-agent: *\nAllow: /\n", encoding="utf-8")
     (out / "404.html").write_text(
-        '<!DOCTYPE html><meta charset="utf-8"><title>Bayan</title>'
+        '<!DOCTYPE html><meta charset="utf-8"><title>BayanQuran</title>'
         '<meta name="viewport" content="width=device-width,initial-scale=1">'
         '<body style="background:#0e1116;color:#e8e6e3;font:16px system-ui;'
         'display:grid;place-items:center;height:100vh;margin:0;text-align:center">'
         '<div><p>That page is not part of the corpus.</p>'
-        '<p><a style="color:#c9a227" href="./">Open Bayan</a></p></div>',
+        '<p><a style="color:#c9a227" href="./">Open BayanQuran</a></p></div>',
         encoding="utf-8",
     )
 
-    print(f"bayan {VERSION} → {out.relative_to(ROOT)}/")
+    print(f"BayanQuran {VERSION} → {out.relative_to(ROOT)}/")
     print(f"  {total_verses} verses, {len(surahs)} surahs, build {build}")
     top = sorted(sizes.items(), key=lambda kv: -kv[1])[:6]
     for name, n in top:
