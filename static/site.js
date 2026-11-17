@@ -114,15 +114,19 @@
 
   async function apiVerse(key) {
     const [surahNo] = String(key).split(":");
-    const payload = await load(surahPath(surahNo));
+    const [payload, detail] = await Promise.all([
+      load(surahPath(surahNo)),
+      load(`sources/${String(Number(surahNo)).padStart(3, "0")}.json`),
+    ]);
     const v = payload.verses.find((x) => x.key === key);
-    if (!v) throw Object.assign(new Error(`${key} is not a verse in the corpus`), { status: 404 });
+    const d = detail[key];
+    if (!v || !d) throw Object.assign(new Error(`${key} is not a verse in the corpus`), { status: 404 });
     return {
       verse: {
         key: v.key,
         surah: payload.surah.number,
         ayah: v.ayah,
-        text_full: v.text_full,
+        text_full: d.text_full,
         text: v.text,
         basmala: v.basmala,
         letters: v.letters,
@@ -131,9 +135,9 @@
         translations: v.translations,
       },
       surah: payload.surah,
-      sources: v.sources,
-      prev: v.prev,
-      next: v.next,
+      sources: d.sources,
+      prev: d.prev,
+      next: d.next,
     };
   }
 

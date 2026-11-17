@@ -56,7 +56,13 @@ def dump(path: Path, payload: object) -> int:
 # ---------------------------------------------------------------- payloads
 
 
-def surah_payload(con: sqlite3.Connection, number: int) -> dict:
+def surah_payload(con: sqlite3.Connection, number: int) -> tuple[dict, dict]:
+    """-> (the reader's verse list, the inspector's per-verse detail).
+
+    The two travel separately because the reader draws a whole surah at once
+    while the inspector looks at one verse: Al-Baqara is ~900 KB with all three
+    editions attached to every verse and ~55 KB without them.
+    """
     surah = dict(con.execute(f"SELECT {SURAH_FIELDS} FROM surahs WHERE number=?", (number,)).fetchone())
     rows = con.execute(
         "SELECT key, ayah, text_full, text_verse, basmala, consensus, variants, "
@@ -81,6 +87,7 @@ def surah_payload(con: sqlite3.Connection, number: int) -> dict:
         sources.setdefault(s["verse_key"], []).append(s)
 
     verses = []
+    detail: dict[str, dict] = {}
     for i, r in enumerate(rows):
         src_out = []
         for s in sources.get(r["key"], []):
@@ -99,21 +106,23 @@ def surah_payload(con: sqlite3.Connection, number: int) -> dict:
                     "diff": diff,
                 }
             )
+        detail[r["key"]] = {
+            "text_full": r["text_full"],
+            "sources": src_out,
+            "prev": keys[i - 1] if i > 0 else None,
+            "next": keys[i + 1] if i + 1 < len(keys) else None,
+        }
         verses.append(
             {
                 "key": r["key"],
                 "ayah": r["ayah"],
                 "n": r["ordinal"] + 1,  # global ayah number, what the CDN names files
                 "text": r["text_verse"],
-                "text_full": r["text_full"],
                 "basmala": bool(r["basmala"]),
                 "consensus": r["consensus"],
                 "variants": r["variants"].split(",") if r["variants"] else [],
                 "letters": r["letters_count"],
                 "translations": tr.get(r["key"], {}),
-                "sources": src_out,
-                "prev": keys[i - 1] if i > 0 else None,
-                "next": keys[i + 1] if i + 1 < len(keys) else None,
             }
         )
     # prev/next only reach outside the surah at its edges, which is what the
@@ -129,9 +138,9 @@ def surah_payload(con: sqlite3.Connection, number: int) -> dict:
             "ORDER BY surah ASC, ayah ASC LIMIT 1",
             (number, number, verses[-1]["ayah"]),
         ).fetchone()
-        verses[0]["prev"] = before["key"] if before else None
-        verses[-1]["next"] = after["key"] if after else None
-    return {"surah": surah, "verses": verses}
+        detail[verses[0]["key"]]["prev"] = before["key"] if before else None
+        detail[verses[-1]["key"]]["next"] = after["key"] if after else None
+    return {"surah": surah, "verses": verses}, detail
 
 
 def status_payload(con: sqlite3.Connection) -> dict:
@@ -292,10 +301,13 @@ def main() -> int:
 
     total_verses = 0
     for s in surahs:
-        payload = surah_payload(con, s["number"])
+        payload, detail = surah_payload(con, s["number"])
         total_verses += len(payload["verses"])
         sizes[f"data/surah/{s['number']:03d}.json"] = dump(
             out / "data" / "surah" / f"{s['number']:03d}.json", payload
+        )
+        sizes[f"data/sources/{s['number']:03d}.json"] = dump(
+            out / "data" / "sources" / f"{s['number']:03d}.json", detail
         )
     sizes["data/search.json"] = dump(out / "data/search.json", search_index(con))
     con.close()
