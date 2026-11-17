@@ -618,3 +618,106 @@ button { cursor: pointer; background: none; border: none; }
   .insp-body { padding-top: 12px; }
   .verse-ar { font-size: 24px; line-height: 1.95; }
 }
+
+/* ---------- surah audio controls ---------- */
+
+.surah-actions { display: flex; gap: 8px; align-items: center; margin-top: 14px; flex-wrap: wrap; }
+.audio-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 11px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--text);
+  background: var(--panel-2);
+  transition: border-color 0.15s, color 0.15s;
+}
+.audio-btn:hover { border-color: var(--gold); color: var(--gold-2); }
+.audio-btn .glyph { font-size: 10px; color: var(--gold); }
+.audio-btn.small { font-size: 11px; padding: 4px 9px; color: var(--muted); }
+.audio-btn[disabled] { opacity: 0.6; cursor: default; }
+.audio-hint { font-size: 10.5px; color: var(--faint); }
+
+/* ---------- player bar ---------- */
+
+.player {
+  display: grid;
+  grid-template-columns: auto minmax(140px, 1.1fr) minmax(120px, 2fr) auto auto auto;
+  align-items: center;
+  gap: 14px;
+  padding: 9px 16px;
+  border-top: 1px solid var(--line-strong);
+  background: color-mix(in oklab, var(--panel) 92%, transparent);
+  backdrop-filter: blur(12px);
+  z-index: 45;
+}
+.player[hidden] { display: none; }
+.p-controls { display: flex; align-items: center; gap: 6px; }
+.playbtn {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #16120a;
+  font-size: 12px;
+  display: grid; place-items: center;
+  border: none;
+}
+.playbtn:hover { background: var(--gold-2); }
+.p-meta { min-width: 0; }
+.p-row { display: flex; align-items: baseline; gap: 7px; }
+.p-ref { font-size: 12px; color: var(--gold); font-variant-numeric: tabular-nums; }
+.p-surah { font-size: 12px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.p-sub { font-size: 10.5px; color: var(--faint); margin-top: 2px; }
+.p-dot { color: var(--faint); }
+.p-track { height: 3px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.p-fill { height: 100%; width: 0%; background: var(--gold); transition: width 0.15s linear; }
+.p-time { font-size: 11px; color: var(--faint); font-variant-numeric: tabular-nums; min-width: 34px; text-align: right; }
+.p-select {
+  font-size: 11px;
+  padding: 5px 8px;
+  border-radius: 7px;
+  border: 1px solid var(--line);
+  background: var(--bg-2);
+  color: var(--muted);
+  max-width: 170px;
+}
+
+/* verse being recited: the transcript follows the audio */
+.verse.playing { background: color-mix(in oklab, var(--gold) 9%, transparent); }
+.verse.playing::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 10px; bottom: 10px;
+  width: 3px;
+  border-radius: 3px;
+  background: var(--gold-2);
+  box-shadow: 0 0 12px rgba(216, 178, 92, 0.5);
+}
+.verse.playing .ref { color: #16120a; background: var(--gold); border-color: var(--gold); }
+.verse-play {
+  opacity: 0;
+  width: 20px; height: 20px;
+  border-radius: 5px;
+  color: var(--muted);
+  font-size: 9px;
+  display: grid; place-items: center;
+  transition: opacity 0.12s;
+}
+.verse:hover .verse-play, .verse:focus-within .verse-play, .verse.playing .verse-play { opacity: 1; }
+.verse-play:hover { color: var(--gold); background: var(--hover); }
+body.has-player .reader-inner { padding-bottom: 120px; }
+
+@media (max-width: 900px) {
+  .player { grid-template-columns: auto 1fr auto auto; gap: 10px; }
+  .p-track, .p-time { display: none; }
+  .p-select { max-width: 120px; }
+}
+
+body.has-player .toast { bottom: 84px; }
+@media (max-width: 1240px) {
+  body.has-player .inspector { bottom: 58px; }
+}
+
+.surah-dl { color: var(--gold); font-size: 9px; margin-left: 5px; opacity: 0.85; }

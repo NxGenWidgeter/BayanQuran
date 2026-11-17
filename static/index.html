@@ -69,6 +69,22 @@
 
   <div id="toast" class="toast" hidden></div>
 
+  <div class="player" id="player" hidden>
+    <div class="p-controls">
+      <button class="icon" id="pPrev" title="Previous verse" aria-label="Previous verse">⏮</button>
+      <button class="playbtn" id="pPlay" aria-label="Play">▶</button>
+      <button class="icon" id="pNext" title="Next verse" aria-label="Next verse">⏭</button>
+    </div>
+    <div class="p-meta">
+      <div class="p-row"><span id="pRef" class="p-ref">—</span><span id="pSurah" class="p-surah"></span></div>
+      <div class="p-row p-sub"><span id="pReciter"></span><span class="p-dot">·</span><span id="pState">ready</span></div>
+    </div>
+    <div class="p-track"><div class="p-fill" id="pFill"></div></div>
+    <div class="p-time" id="pTime">0:00</div>
+    <select id="pEdition" class="p-select" aria-label="Reciter"></select>
+    <button class="icon" id="pClose" title="Close player" aria-label="Close player">✕</button>
+  </div>
+
   <script src="/static/app.js?v=__V__"></script>
 </body>
 </html>

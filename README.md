@@ -48,15 +48,43 @@ Any verse can be re-checked live from the inspector: Tanzil's whole file is
 re-downloaded and re-hashed, and the two APIs are queried for that single verse.
 The verdict never consults the cached corpus.
 
+## Recitation and transcript
+
+Any surah can be recited with its verses acting as the transcript. The audio is
+one MP3 per ayah, so the transcript is exact by construction — no timestamps are
+guessed: verse 12:39 is the file for 12:39, and the reader highlights and scrolls
+to whichever verse is sounding.
+
+- Four reciters (Alafasy, Husary, Abdul Basit, As-Sudais) at 64 kbps, from the
+  Islamic Network CDN (`cdn.islamic.network`).
+- **Listen** streams immediately; **Download** saves every verse of the surah to
+  `data/audio/<reciter>/<surah>/` so it plays with no network afterwards. A ♪
+  beside the surah number in the sidebar means the recitation is on disk.
+- **Transcript** saves the surah's Arabic and translation as a `.txt` file.
+- Downloaded audio is ~100 KB per verse; the whole Quran is about 610 MB.
+
+```
+./download_audio.py --surahs 1,18,36,55,67,78,112-114
+./download_audio.py --all                      # about 610 MB, ~25 min
+./download_audio.py --list
+./download_audio.py --remove 18
+```
+
+The recitation is **not** part of the text verification. Files come from a
+different provider and are matched to verses by ayah number; the checksum and
+cross-source work above says nothing about them.
+
 ## Layout
 
 ```
 build_corpus.py       fetch, verify, build data/bayan.db (--refresh / --offline)
 verifier.py           normalisation and comparison rules
+audio.py              per-ayah recitation: download, manifest, local/CDN urls
+download_audio.py     bulk downloader CLI
 app.py                FastAPI service, 127.0.0.1 only
 static/               one page, no framework, no CDN
 tests/verify_corpus.py  re-derives every claim from the database, then the API
-data/                 bayan.db + raw downloads (rebuildable, not tracked)
+data/                 bayan.db, raw downloads, audio (rebuildable, not tracked)
 ```
 
 The service refuses any client that is not loopback, and binds `127.0.0.1` only.
@@ -74,6 +102,12 @@ connection.
 | `GET /api/search?q=` | Arabic letters (diacritic-insensitive) or translation text |
 | `GET /api/random` | a verse key |
 | `GET /api/verify/{s}:{a}` | live re-fetch of all three sources and the verdict |
+| `GET /api/audio/config` | reciters, bitrate, which surahs are downloaded |
+| `GET /api/audio/{n}` | per-verse audio urls (local or CDN) + download state |
+| `POST /api/audio/{n}/download` | fetch every verse of a surah for offline playback |
+| `GET /api/audio/{n}/status` | download progress |
+| `DELETE /api/audio/{n}` | delete that surah's audio |
+| `GET /audio/...` | the MP3 files themselves (range requests supported) |
 
 ## Rebuilding
 
@@ -103,6 +137,8 @@ counts are products of those rules.
   here.
 - The live check needs the network. Tanzil re-downloads 1.3 MB each time, so that
   step can take a minute.
+- Recitation is streamed from a third party or served from `data/audio/`; it is
+  matched to verses by ayah number and is not covered by the text verification.
 
 ## Fonts
 

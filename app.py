@@ -22,6 +22,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 
+import audio
 import verifier
 
 ROOT = Path(__file__).resolve().parent
@@ -82,6 +83,10 @@ def healthz() -> str:
 
 
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
+
+# Recitation files are downloaded on demand; the mount has to exist up front.
+audio.AUDIO.mkdir(parents=True, exist_ok=True)
+app.mount("/audio", StaticFiles(directory=audio.AUDIO), name="audio")
 
 
 # ---------------------------------------------------------------- data access
@@ -376,6 +381,71 @@ def api_verify(key: str) -> JSONResponse:
             "sources": ordered,
         }
     )
+
+
+# ---------------------------------------------------------------- recitation
+
+
+def _surah_arg(surah: int) -> None:
+    if not 1 <= surah <= 114:
+        raise HTTPException(400, "surah must be 1-114")
+
+
+def _edition_arg(edition: str | None) -> str:
+    edition = edition or audio.DEFAULT_EDITION
+    if edition not in audio.EDITIONS:
+        raise HTTPException(400, f"unknown reciter {edition!r}")
+    return edition
+
+
+@app.get("/api/audio/config")
+def api_audio_config() -> JSONResponse:
+    return JSONResponse(
+        {
+            "default": audio.DEFAULT_EDITION,
+            "bitrate": audio.DEFAULT_BITRATE,
+            "bytes_per_ayah": audio.BYTES_PER_AYAH,
+            "editions": [audio.edition_info(e) for e in audio.EDITIONS],
+            "downloaded": {e: audio.downloaded_surahs(e) for e in audio.EDITIONS},
+        }
+    )
+
+
+@app.get("/api/audio/{surah}")
+def api_audio_surah(surah: int, edition: str | None = None) -> JSONResponse:
+    _surah_arg(surah)
+    edition = _edition_arg(edition)
+    state = audio.local_state(edition, surah)
+    return JSONResponse(
+        {
+            **state,
+            "urls": audio.urls_for(edition, surah),
+            "job": audio.job_state(edition, surah),
+        }
+    )
+
+
+@app.post("/api/audio/{surah}/download")
+def api_audio_download(surah: int, edition: str | None = None) -> JSONResponse:
+    _surah_arg(surah)
+    edition = _edition_arg(edition)
+    job = audio.start_download(edition, surah)
+    return JSONResponse(job, status_code=202)
+
+
+@app.get("/api/audio/{surah}/status")
+def api_audio_status(surah: int, edition: str | None = None) -> JSONResponse:
+    _surah_arg(surah)
+    edition = _edition_arg(edition)
+    job = audio.job_state(edition, surah) or {"state": "idle"}
+    return JSONResponse({**job, **audio.local_state(edition, surah)})
+
+
+@app.delete("/api/audio/{surah}")
+def api_audio_delete(surah: int, edition: str | None = None) -> JSONResponse:
+    _surah_arg(surah)
+    edition = _edition_arg(edition)
+    return JSONResponse(audio.delete_surah(edition, surah))
 
 
 @app.get("/api/status")

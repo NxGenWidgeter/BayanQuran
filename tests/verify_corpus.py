@@ -17,6 +17,7 @@ import hashlib
 import json
 import sqlite3
 import sys
+import time
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -163,6 +164,8 @@ def api_checks(live: bool) -> None:
     check("page sends Cache-Control: no-store", resp.headers.get("Cache-Control") == "no-store",
           str(resp.headers.get("Cache-Control")))
 
+    audio_checks()
+
     if live:
         print("live re-check (network)")
         out = get_json("/api/verify/2:255", timeout=180)
@@ -170,6 +173,51 @@ def api_checks(live: bool) -> None:
               f"{out['agreeing']}/{out['responding']}")
         tz = [s for s in out["sources"] if s["id"] == "tanzil"][0]
         check("live Tanzil checksum matches", tz.get("checksum_ok") is True)
+
+
+def post(path: str, timeout: int = 30):
+    req = urllib.request.Request(BASE + path, method="POST", headers={"Accept": "application/json"})
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
+        return resp.status, json.loads(resp.read())
+
+
+def audio_checks() -> None:
+    print("recitation")
+    cfg = get_json("/api/audio/config")
+    check("reciters offered", len(cfg["editions"]) >= 3, f"{len(cfg['editions'])} editions")
+    check("audio bitrate is 64 kbps", cfg["bitrate"] == 64)
+
+    state = get_json("/api/audio/113?edition=ar.alafasy")
+    check("one audio url per verse", len(state["urls"]) == 5, str(len(state["urls"])))
+
+    if not state["complete"]:
+        post("/api/audio/113/download?edition=ar.alafasy")
+        for _ in range(40):
+            time.sleep(1)
+            polled = get_json("/api/audio/113/status?edition=ar.alafasy")
+            if polled.get("state") in ("done", "error"):
+                break
+        state = get_json("/api/audio/113?edition=ar.alafasy")
+
+    check("surah audio downloaded", state["complete"] and state["bytes"] > 0,
+          f"{state['present']}/{state['ayahs']} files, {state['bytes']} bytes")
+    check("downloaded files are served locally", state["urls"]["1"].startswith("/audio/"),
+          state["urls"]["1"])
+
+    with urllib.request.urlopen(BASE + state["urls"]["1"], timeout=20) as resp:
+        body = resp.read()
+        check("audio file plays back over http", resp.status == 200 and resp.headers.get("Content-Type") == "audio/mpeg" and len(body) > 5000,
+              f"{len(body)} bytes, {resp.headers.get('Content-Type')}")
+        check("audio is really MP3", body[:3] == b"ID3" or body[0] == 0xFF, str(body[:3]))
+
+    req = urllib.request.Request(BASE + state["urls"]["1"], headers={"Range": "bytes=0-99"})
+    with urllib.request.urlopen(req, timeout=20) as resp:
+        check("range requests work (seeking)", resp.status == 206, str(resp.status))
+
+    bad = request("/api/audio/115?edition=ar.alafasy")
+    check("bad surah number refused", bad[0] == 400, str(bad[0]))
+    bad = request("/api/audio/1?edition=nope")
+    check("unknown reciter refused", bad[0] == 400, str(bad[0]))
 
 
 def request(path: str, timeout: int = 20):

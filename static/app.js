@@ -11,7 +11,22 @@ const state = {
   status: null,
   search: { q: "", results: [], mode: null, busy: false },
   suppressHash: false,
+  audio: {
+    config: null,
+    edition: "ar.alafasy",
+    surahState: null,
+    urls: {},
+    active: false,
+    playing: false,
+    ayah: 1,
+    surah: null,
+    jobTimer: null,
+    downloaded: new Set(),
+  },
 };
+
+const player = new Audio();
+player.preload = "auto";
 
 const TRANSLATORS = {
   en: "Saheeh International",
@@ -57,8 +72,12 @@ function toast(message) {
   toastTimer = setTimeout(() => (box.hidden = true), 2600);
 }
 
-async function api(path) {
-  const res = await fetch(path, { headers: { Accept: "application/json" }, cache: "no-store" });
+async function api(path, options = {}) {
+  const res = await fetch(path, {
+    ...options,
+    headers: { Accept: "application/json", ...(options.headers || {}) },
+    cache: "no-store",
+  });
   if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
   return res.json();
 }
@@ -138,7 +157,10 @@ function renderSurahs(filter = "") {
           el("span", { class: "surah-en", text: s.name_en }),
           el("span", { class: "surah-ar", text: s.name_ar_short, lang: "ar" }),
         ]),
-        el("div", { class: "surah-sub", text: `${s.ayahs} verses · ${s.revelation}` }),
+        el("div", { class: "surah-sub" }, [
+          `${s.ayahs} verses · ${s.revelation}`,
+          state.audio.downloaded.has(s.number) ? el("span", { class: "surah-dl", text: "♪", title: "recitation downloaded" }) : null,
+        ]),
       ]),
     ]);
     list.append(row);
@@ -160,6 +182,7 @@ function surahHeading(s) {
       el("span", { class: "tag", text: `${s.ayahs} verses` }),
       el("span", { class: "tag", text: s.revelation }),
     ]),
+    el("div", { class: "surah-actions", id: "surahActions" }),
   ]);
 }
 
@@ -176,6 +199,16 @@ function verseCard(v) {
   }, [
     el("div", { class: "verse-top" }, [
       el("span", { class: "ref", text: v.key }),
+      el("button", {
+        class: "verse-play",
+        text: "▶",
+        title: "Recite from this verse",
+        "aria-label": `Recite from verse ${v.key}`,
+        onclick: (e) => {
+          e.stopPropagation();
+          startListening(v.ayah);
+        },
+      }),
       el("span", { class: "spacer" }),
       consensusDots(v.consensus),
     ]),
@@ -203,6 +236,7 @@ function renderVerses() {
     }));
   }
   for (const v of state.verses) inner.append(verseCard(v));
+  if (state.audio.active && state.audio.surah === state.surah) markPlaying(state.audio.ayah, false);
 }
 
 let surahToken = 0;
@@ -218,6 +252,7 @@ async function loadSurah(number, ayah = null) {
   const token = ++surahToken;
   const data = await api(`/api/surah/${number}`);
   if (token !== surahToken) return; // a newer surah load won
+  if (state.audio.surah && state.audio.surah !== number) stopPlayback(true);
   state.surah = number;
   state.verses = data.verses;
   state.selected = null;
@@ -228,6 +263,7 @@ async function loadSurah(number, ayah = null) {
   store("bayan.surah", String(number));
   setHash(String(number));
   $(".reader").scrollTop = 0;
+  reloadAudioForSurah();
   if (ayah) selectVerse(`${number}:${ayah}`);
 }
 
@@ -623,6 +659,287 @@ function renderStatus() {
   ]));
 }
 
+/* ---------- recitation + transcript ---------- */
+
+const fmtBytes = (n) => (n >= 1024 * 1024 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1024))} KB`);
+const fmtTime = (t) => (Number.isFinite(t) ? `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}` : "0:00");
+
+async function initAudio() {
+  const cfg = await api("/api/audio/config");
+  state.audio.config = cfg;
+  const saved = store("bayan.reciter");
+  state.audio.edition = cfg.editions.some((e) => e.id === saved) ? saved : cfg.default;
+
+  const sel = $("#pEdition");
+  sel.replaceChildren(...cfg.editions.map((e) => el("option", { value: e.id, text: e.name })));
+  sel.value = state.audio.edition;
+  state.audio.downloaded = new Set(cfg.downloaded[state.audio.edition] || []);
+  refreshDownloaded();
+  sel.onchange = () => {
+    state.audio.edition = sel.value;
+    store("bayan.reciter", sel.value);
+    reloadAudioForSurah(true);
+  };
+
+  player.addEventListener("ended", () => nextAyah(true));
+  player.addEventListener("timeupdate", updateProgress);
+  player.addEventListener("loadedmetadata", updateProgress);
+  player.addEventListener("play", () => { state.audio.playing = true; paintPlay(); });
+  player.addEventListener("pause", () => { state.audio.playing = false; paintPlay(); });
+  player.addEventListener("error", () => {
+    if (!state.audio.active) return;
+    $("#pState").textContent = "audio unavailable — try another reciter";
+  });
+
+  $("#pPlay").onclick = togglePlay;
+  $("#pPrev").onclick = () => state.audio.ayah > 1 && playAyah(state.audio.ayah - 1);
+  $("#pNext").onclick = () => nextAyah(false);
+  $("#pClose").onclick = () => stopPlayback();
+}
+
+async function refreshDownloaded() {
+  try {
+    const cfg = await api("/api/audio/config");
+    state.audio.downloaded = new Set(cfg.downloaded[state.audio.edition] || []);
+    if (state.surahs.length) renderSurahs($("#surahFilter").value);
+  } catch {
+    /* a stale marker is harmless */
+  }
+}
+
+async function reloadAudioForSurah(keepPlaying = false) {
+  if (!state.surah) return;
+  try {
+    const data = await api(`/api/audio/${state.surah}?edition=${state.audio.edition}`);
+    state.audio.surahState = data;
+    state.audio.urls = data.urls;
+    renderSurahActions();
+    if (keepPlaying && state.audio.active && state.audio.surah === state.surah) {
+      playAyah(state.audio.ayah, true);
+    }
+  } catch (err) {
+    toast("Could not read audio state: " + err.message);
+  }
+}
+
+function renderSurahActions() {
+  const box = $("#surahActions");
+  if (!box) return;
+  const st = state.audio.surahState;
+  box.replaceChildren(
+    el("button", {
+      class: "audio-btn",
+      title: "Recite this surah with the verses as a transcript",
+      onclick: () => startListening(),
+    }, [el("span", { class: "glyph", text: "▶" }), "Listen"]),
+    el("button", {
+      class: "audio-btn small",
+      title: "Save this surah's verses as a text transcript",
+      onclick: () => downloadTranscript(),
+    }, ["Transcript"]),
+  );
+  if (!st) return;
+  const per = state.audio.config?.bytes_per_ayah || 65536;
+
+  if (st.job && ["running", "queued"].includes(st.job.state)) {
+    const pct = st.job.total ? Math.round((100 * st.job.done) / st.job.total) : 0;
+    box.append(el("span", { class: "audio-btn small", text: `Downloading ${st.job.done}/${st.job.total} · ${pct}%` }));
+    startJobPolling();
+    return;
+  }
+  if (st.complete) {
+    box.append(el("button", {
+      class: "audio-btn small",
+      title: "Delete the downloaded files for this surah",
+      onclick: () => removeAudio(),
+    }, [el("span", { class: "glyph", text: "✓" }), `Downloaded · ${fmtBytes(st.bytes)}`]));
+    box.append(el("span", { class: "audio-hint", text: "plays offline" }));
+    return;
+  }
+  if (st.job && st.job.state === "error") {
+    box.append(el("button", { class: "audio-btn small", onclick: () => startDownload(), title: st.job.error },
+      ["Download failed — retry"]));
+    return;
+  }
+  box.append(el("button", {
+    class: "audio-btn small",
+    title: "Download every verse of this surah so it plays offline",
+    onclick: () => startDownload(),
+  }, [el("span", { class: "glyph", text: "↓" }), `Download · ~${fmtBytes(st.ayahs * per)}`]));
+  if (st.present) box.append(el("span", { class: "audio-hint", text: `${st.present}/${st.ayahs} on disk` }));
+}
+
+async function startDownload() {
+  try {
+    await api(`/api/audio/${state.surah}/download?edition=${state.audio.edition}`, { method: "POST" });
+    await reloadAudioForSurah();
+    startJobPolling();
+  } catch (err) {
+    toast("Download failed: " + err.message);
+  }
+}
+
+function startJobPolling() {
+  if (state.audio.jobTimer) return;
+  const surah = state.surah;
+  state.audio.jobTimer = setInterval(async () => {
+    if (state.surah !== surah) {
+      clearInterval(state.audio.jobTimer);
+      state.audio.jobTimer = null;
+      return;
+    }
+    try {
+      const st = await api(`/api/audio/${surah}/status?edition=${state.audio.edition}`);
+      state.audio.surahState = st;
+      renderSurahActions();
+      if (["done", "error"].includes(st.state)) {
+        clearInterval(state.audio.jobTimer);
+        state.audio.jobTimer = null;
+        if (st.state === "done") {
+          await reloadAudioForSurah();
+          await refreshDownloaded();
+          toast(`Audio saved — ${st.ayahs} verses play offline`);
+        } else {
+          toast("Download failed: " + (st.error || "unknown error"));
+        }
+      }
+    } catch {
+      clearInterval(state.audio.jobTimer);
+      state.audio.jobTimer = null;
+    }
+  }, 700);
+}
+
+async function removeAudio() {
+  if (!confirm("Delete the downloaded recitation for this surah?")) return;
+  await api(`/api/audio/${state.surah}?edition=${state.audio.edition}`, { method: "DELETE" });
+  await reloadAudioForSurah();
+  await refreshDownloaded();
+  toast("Downloaded audio removed");
+}
+
+function openPlayer() {
+  state.audio.active = true;
+  $("#player").hidden = false;
+  document.body.classList.add("has-player");
+  $("#pReciter").textContent = state.audio.config?.editions.find((e) => e.id === state.audio.edition)?.name || "";
+}
+
+function startListening(ayah) {
+  openPlayer();
+  const from = ayah || (state.selected && Number(state.selected.split(":")[1])) || 1;
+  playAyah(from);
+}
+
+function playAyah(n, resume = false) {
+  if (!state.surah) return;
+  const url = state.audio.urls[String(n)];
+  if (!url) {
+    toast("No recitation for this verse");
+    return;
+  }
+  state.audio.ayah = n;
+  state.audio.surah = state.surah;
+  openPlayer();
+  const local = url.startsWith("/audio/");
+  player.src = url;
+  if (!resume) player.currentTime = 0;
+  $("#pState").textContent = local ? "playing from download" : "streaming";
+  const surah = state.surahs.find((x) => x.number === state.surah);
+  $("#pRef").textContent = `${state.surah}:${n}`;
+  $("#pSurah").textContent = surah ? surah.name_en : "";
+  markPlaying(n, true);
+  player.play().catch(() => {
+    state.audio.playing = false;
+    paintPlay();
+    $("#pState").textContent = "press play";
+  });
+}
+
+function nextAyah(auto = false) {
+  const total = state.audio.surahState?.ayahs || state.verses.length || 114;
+  if (state.audio.ayah >= total) {
+    if (auto) {
+      state.audio.playing = false;
+      paintPlay();
+      $("#pState").textContent = "surah finished";
+    }
+    return;
+  }
+  playAyah(state.audio.ayah + 1);
+}
+
+function togglePlay() {
+  if (!state.audio.active) {
+    startListening();
+    return;
+  }
+  if (player.paused) player.play().catch(() => {});
+  else player.pause();
+}
+
+function paintPlay() {
+  $("#pPlay").textContent = state.audio.playing ? "❚❚" : "▶";
+  $("#pPlay").setAttribute("aria-label", state.audio.playing ? "Pause" : "Play");
+}
+
+function updateProgress() {
+  const dur = player.duration;
+  const pos = player.currentTime;
+  $("#pFill").style.width = dur ? `${Math.min(100, (100 * pos) / dur)}%` : "0%";
+  $("#pTime").textContent = fmtTime(pos);
+}
+
+function markPlaying(n, scroll) {
+  const key = `${state.surah}:${n}`;
+  for (const card of document.querySelectorAll(".verse")) {
+    card.classList.toggle("playing", card.dataset.key === key);
+  }
+  if (scroll) ensureVisible(document.querySelector(`.verse[data-key="${key}"]`));
+}
+
+function stopPlayback(silent = false) {
+  player.pause();
+  player.removeAttribute("src");
+  player.load();
+  state.audio.active = false;
+  state.audio.playing = false;
+  state.audio.surah = null;
+  $("#player").hidden = true;
+  document.body.classList.remove("has-player");
+  $("#pFill").style.width = "0%";
+  $("#pTime").textContent = "0:00";
+  for (const card of document.querySelectorAll(".verse.playing")) card.classList.remove("playing");
+  paintPlay();
+  if (silent !== true) $("#pState").textContent = "ready";
+}
+
+function downloadTranscript() {
+  const s = state.surahs.find((x) => x.number === state.surah);
+  if (!s) return;
+  const lines = [
+    `${s.name_en} · ${s.name_ar}`,
+    `Surah ${s.number} of the Quran — ${s.ayahs} verses, ${s.revelation}`,
+    "Verses verified letter-for-letter against Tanzil, Quran.com and Al Quran Cloud.",
+    "",
+  ];
+  for (const v of state.verses) {
+    lines.push(`[${v.key}]`);
+    lines.push(v.text);
+    const tr = v.translations[state.lang] || v.translations.en;
+    if (tr) lines.push(tr);
+    lines.push("");
+  }
+  const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = el("a", { href: url, download: `quran-${String(s.number).padStart(3, "0")}-${s.name_en.toLowerCase()}-transcript.txt` });
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+  toast("Transcript saved");
+}
+
 /* ---------- hash routing ---------- */
 
 function setHash(value) {
@@ -717,6 +1034,9 @@ async function boot() {
     } else if (e.key === "Escape") {
       if (!$("#statusModal").hidden) $("#statusModal").hidden = true;
       else if (!$("#inspector").hidden && !typing) closeInspector();
+    } else if (!typing && e.key === " " && state.audio.active) {
+      e.preventDefault();
+      togglePlay();
     } else if (!typing && (e.key === "j" || e.key === "k")) {
       const keys = state.verses.map((v) => v.key);
       const idx = keys.indexOf(state.selected);
@@ -729,6 +1049,12 @@ async function boot() {
   });
 
   window.addEventListener("hashchange", handleHash);
+
+  try {
+    await initAudio();
+  } catch (err) {
+    toast("Recitation unavailable: " + err.message);
+  }
 
   const { surah: hashSurah, ayah: hashAyah } = parseHash();
   const lastSurah = Number(store("bayan.surah")) || 1;
