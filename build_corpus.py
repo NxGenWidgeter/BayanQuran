@@ -120,6 +120,14 @@ def parse_tanzil(text: str) -> tuple[dict[str, str], int]:
     return verses, len(verses)
 
 
+# Quran.com metadata says "Meccan"/"Medinan"; the app says Mekah/Madinah.
+REVELATION_LABELS = {"Meccan": "Mekah", "Medinan": "Madinah"}
+
+
+def revelation_label(value: str) -> str:
+    return REVELATION_LABELS.get(value, value)
+
+
 def key_order(key: str) -> tuple[int, int]:
     s, a = key.split(":")
     return int(s), int(a)
@@ -305,7 +313,7 @@ def main() -> int:
                 meta_surahs[s]["englishName"],
                 meta_surahs[s]["englishNameTranslation"],
                 counts[s],
-                meta_surahs[s]["revelationType"],
+                revelation_label(meta_surahs[s]["revelationType"]),
             )
             for s in range(1, 115)
         ],

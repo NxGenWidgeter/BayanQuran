@@ -61,6 +61,9 @@ to whichever verse is sounding.
   `data/audio/<reciter>/<surah>/` so it plays with no network afterwards. A ♪
   beside the surah number in the sidebar means the recitation is on disk.
 - **Transcript** saves the surah's Arabic and translation as a `.txt` file.
+- Playback never hard-stops: the last verse fades down as it ends and the next
+  surah fades up, so listening runs on uninterrupted (114 wraps back to 1).
+  Built for falling asleep to it — a cut at 2am does the opposite of the job.
 - Downloaded audio is ~100 KB per verse; the whole Quran is about 610 MB.
 
 ```

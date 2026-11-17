@@ -269,7 +269,7 @@ async function loadSurah(number, ayah = null) {
   const token = ++surahToken;
   const data = await api(`/api/surah/${number}`);
   if (token !== surahToken) return; // a newer surah load won
-  if (state.audio.surah && state.audio.surah !== number) stopPlayback(true);
+  if (state.audio.surah && state.audio.surah !== number && !state.audio.advancing) stopPlayback(true);
   state.surah = number;
   state.verses = data.verses;
   state.selected = null;
@@ -716,7 +716,11 @@ async function initAudio() {
   player.addEventListener("ended", () => nextAyah(true));
   player.addEventListener("timeupdate", updateProgress);
   player.addEventListener("loadedmetadata", updateProgress);
-  player.addEventListener("play", () => { state.audio.playing = true; paintPlay(); });
+  player.addEventListener("play", () => {
+    state.audio.playing = true;
+    if (!state.audio.fading) player.volume = 1;   // never resume stuck quiet
+    paintPlay();
+  });
   player.addEventListener("pause", () => { state.audio.playing = false; paintPlay(); });
   player.addEventListener("error", () => {
     if (!state.audio.active) return;
@@ -862,13 +866,45 @@ function openPlayer() {
   $("#pReciter").textContent = state.audio.config?.editions.find((e) => e.id === state.audio.edition)?.name || "";
 }
 
+/* Continuous recitation. When a surah's last verse ends, the next surah starts
+   on its own: the final verse fades down as it approaches its end, then the
+   first verse of the next surah fades up. No cut, no dead air, no stopping at
+   2am. Wraps from 114 back to 1 so an overnight listen never runs dry. */
+const FADE_IN_MS = 1600;
+const FADE_OUT_S = 1.6;
+let fadeTimer = null;
+let fadeOutArmed = -1;      // verse number whose fade-down already started
+
+function stopFade() {
+  if (fadeTimer) {
+    clearInterval(fadeTimer);
+    fadeTimer = null;
+  }
+  state.audio.fading = false;
+}
+
+function fadeTo(target, ms, done) {
+  stopFade();
+  state.audio.fading = true;
+  const from = player.volume;
+  const start = performance.now();
+  fadeTimer = setInterval(() => {
+    const t = Math.min(1, (performance.now() - start) / Math.max(1, ms));
+    player.volume = Math.max(0, Math.min(1, from + (target - from) * t));
+    if (t >= 1) {
+      stopFade();
+      if (done) done();
+    }
+  }, 40);
+}
+
 function startListening(ayah) {
   openPlayer();
   const from = ayah || (state.selected && Number(state.selected.split(":")[1])) || 1;
   playAyah(from);
 }
 
-function playAyah(n, resume = false) {
+function playAyah(n, resume = false, fadeIn = false) {
   if (!state.surah) return;
   const url = state.audio.urls[String(n)];
   if (!url) {
@@ -879,6 +915,15 @@ function playAyah(n, resume = false) {
   state.audio.surah = state.surah;
   openPlayer();
   const local = url.startsWith("/audio/");
+  stopFade();
+  fadeOutArmed = -1;
+  if (fadeIn) {
+    // guard the `play` handler: it snaps volume back to 1 unless a fade is live
+    state.audio.fading = true;
+    player.volume = 0;
+  } else {
+    player.volume = 1;
+  }
   player.src = url;
   if (!resume) player.currentTime = 0;
   $("#pState").textContent = local ? "playing from download" : "streaming";
@@ -886,7 +931,10 @@ function playAyah(n, resume = false) {
   $("#pRef").textContent = `${state.surah}:${n}`;
   $("#pSurah").textContent = surah ? surah.name_en : "";
   markPlaying(n, true);
-  player.play().catch(() => {
+  player.play().then(() => {
+    if (fadeIn) fadeTo(1, FADE_IN_MS);
+  }).catch(() => {
+    player.volume = 1;
     state.audio.playing = false;
     paintPlay();
     $("#pState").textContent = "press play";
@@ -896,14 +944,29 @@ function playAyah(n, resume = false) {
 function nextAyah(auto = false) {
   const total = state.audio.surahState?.ayahs || state.verses.length || 114;
   if (state.audio.ayah >= total) {
-    if (auto) {
-      state.audio.playing = false;
-      paintPlay();
-      $("#pState").textContent = "surah finished";
-    }
+    if (auto) continueToNextSurah();
     return;
   }
   playAyah(state.audio.ayah + 1);
+}
+
+async function continueToNextSurah() {
+  const next = state.surah >= 114 ? 1 : state.surah + 1;
+  const surah = state.surahs.find((x) => x.number === next);
+  const name = surah ? surah.name_en : `surah ${next}`;
+  $("#pState").textContent = `fading into ${name}`;
+  state.audio.advancing = true;
+  try {
+    await loadSurah(next);
+    await reloadAudioForSurah();
+  } catch (err) {
+    toast("Could not continue to the next surah: " + err.message);
+    return;
+  } finally {
+    state.audio.advancing = false;
+  }
+  fadeOutArmed = -1;
+  playAyah(1, false, true);
 }
 
 function togglePlay() {
@@ -925,6 +988,18 @@ function updateProgress() {
   const pos = player.currentTime;
   $("#pFill").style.width = dur ? `${Math.min(100, (100 * pos) / dur)}%` : "0%";
   $("#pTime").textContent = fmtTime(pos);
+
+  // Last verse of the surah: ease the volume down before the file ends, so the
+  // hand-off to the next surah is a fade rather than a cut.
+  const total = state.audio.surahState?.ayahs || 0;
+  const onLastVerse = total && state.audio.ayah >= total;
+  if (onLastVerse && dur && !player.paused && fadeOutArmed !== state.audio.ayah) {
+    const left = dur - pos;
+    if (left <= FADE_OUT_S) {
+      fadeOutArmed = state.audio.ayah;
+      fadeTo(0, Math.max(250, left * 1000));
+    }
+  }
 }
 
 function markPlaying(n, scroll) {
@@ -936,6 +1011,9 @@ function markPlaying(n, scroll) {
 }
 
 function stopPlayback(silent = false) {
+  stopFade();
+  player.volume = 1;
+  fadeOutArmed = -1;
   player.pause();
   player.removeAttribute("src");
   player.load();
