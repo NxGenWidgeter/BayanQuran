@@ -132,6 +132,17 @@ function consensusDots(n) {
 
 /* ---------- surah list ---------- */
 
+/* On a phone the list is a drawer (style.css, <=900px). */
+function openDrawer() {
+  $(".sidebar").classList.add("open");
+  $("#menuBtn").setAttribute("aria-expanded", "true");
+}
+
+function closeDrawer() {
+  $(".sidebar").classList.remove("open");
+  $("#menuBtn").setAttribute("aria-expanded", "false");
+}
+
 function renderSurahs(filter = "") {
   const list = $("#surahList");
   const needle = filter.trim().toLowerCase();
@@ -146,9 +157,15 @@ function renderSurahs(filter = "") {
       dataset: { n: s.number },
       role: "button",
       tabindex: "0",
-      onclick: () => loadSurah(s.number),
+      onclick: () => {
+        loadSurah(s.number);
+        closeDrawer();
+      },
       onkeydown: (e) => {
-        if (e.key === "Enter" || e.key === " ") loadSurah(s.number);
+        if (e.key === "Enter" || e.key === " ") {
+          loadSurah(s.number);
+          closeDrawer();
+        }
       },
     }, [
       el("span", { class: "surah-num", text: s.number }),
@@ -530,7 +547,9 @@ async function liveCheck(key, button) {
   button.disabled = true;
   button.textContent = "Checking…";
   out.hidden = false;
-  out.replaceChildren(el("span", { text: "Contacting Tanzil, Quran.com and Al Quran Cloud… Tanzil re-downloads its whole 1.3 MB text file, so this can take up to a minute." }));
+  out.replaceChildren(el("span", { text: window.BAYAN_STATIC
+    ? "Contacting Quran.com and Al Quran Cloud… Tanzil cannot be re-downloaded by a browser, so its build-time verdict is shown instead."
+    : "Contacting Tanzil, Quran.com and Al Quran Cloud… Tanzil re-downloads its whole 1.3 MB text file, so this can take up to a minute." }));
   try {
     const res = await api(`/api/verify/${key}`);
     out.replaceChildren();
@@ -538,6 +557,15 @@ async function liveCheck(key, button) {
     for (const src of res.sources) {
       if (src.error) {
         lines.push(el("div", {}, [el("span", { class: "err", text: "✕ " }), `${src.name}: ${src.error}`]));
+        continue;
+      }
+      if (src.recorded) {
+        lines.push(el("div", {}, [
+          el("span", { class: src.letters_equal ? "ok" : "bad", text: src.letters_equal ? "• " : "! " }),
+          `${src.name}: ${src.letters_equal ? "agrees" : "differs"} · checked at build time`,
+          src.checksum_ok === true ? el("span", { class: "ok", text: " · sha256 verified" }) : null,
+          el("span", { style: "color:var(--faint)", text: src.note ? ` — ${src.note}` : "" }),
+        ]));
         continue;
       }
       const good = src.letters_equal;
@@ -550,11 +578,13 @@ async function liveCheck(key, button) {
     }
     out.append(
       el("div", { style: "margin-bottom:6px;color:var(--text)" },
-        [`Checked just now in ${res.seconds}s — ${res.agreeing} of ${res.responding} answering sources agree` +
+        [`Checked just now in ${res.seconds}s — ${res.agreeing} of ${res.total} sources agree` +
          (res.responding < res.total ? ` (${res.total - res.responding} unreachable)` : "")]),
       ...lines,
       el("div", { style: "margin-top:6px;color:var(--faint)" },
-        ["Cached corpus is not consulted for the verdict; the texts above were fetched live."]),
+        [window.BAYAN_STATIC
+          ? "The two APIs were fetched live just now; Tanzil's line is the build-time check, since tanzil.net sends no CORS header."
+          : "Cached corpus is not consulted for the verdict; the texts above were fetched live."]),
     );
     out.scrollIntoView({ block: "nearest" });
   } catch (err) {
@@ -617,7 +647,9 @@ function renderStatus() {
   }
   body.append(table);
 
-  body.append(el("h3", { text: "Integrity checks (run against the database now)" }));
+  body.append(el("h3", { text: window.BAYAN_STATIC
+    ? "Integrity checks (verified when this edition was published)"
+    : "Integrity checks (run against the database now)" }));
   const checks = el("div", { class: "checks" });
   for (const c of st.checks) {
     checks.append(el("div", { class: "check" + (c.ok ? "" : " fail") }, [
@@ -740,6 +772,11 @@ function renderSurahActions() {
   );
   if (!st) return;
   const per = state.audio.config?.bytes_per_ayah || 65536;
+
+  if (st.stream_only) {
+    box.append(el("span", { class: "audio-hint", text: "streams from the CDN · offline downloads need the desktop app" }));
+    return;
+  }
 
   if (st.job && ["running", "queued"].includes(st.job.state)) {
     const pct = st.job.total ? Math.round((100 * st.job.done) / st.job.total) : 0;
@@ -1004,11 +1041,20 @@ async function boot() {
     renderSurahs();
   } catch (err) {
     $("#statusLabel").textContent = "corpus error";
-    $("#readerInner").replaceChildren(el("div", { class: "empty", text: "Cannot reach the local service: " + err.message }));
+    $("#readerInner").replaceChildren(el("div", { class: "empty", text: (window.BAYAN_STATIC ? "Cannot load the corpus: " : "Cannot reach the local service: ") + err.message }));
     return;
   }
 
   $("#surahFilter").addEventListener("input", (e) => renderSurahs(e.target.value));
+  $("#menuBtn").onclick = () => {
+    if ($(".sidebar").classList.contains("open")) closeDrawer();
+    else openDrawer();
+  };
+  document.addEventListener("click", (e) => {
+    if (!$(".sidebar").classList.contains("open")) return;
+    if (e.target.closest(".sidebar") || e.target.closest("#menuBtn")) return;
+    closeDrawer();
+  });
   $("#q").addEventListener("input", (e) => onSearchInput(e.target.value));
   $("#q").addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
@@ -1032,7 +1078,8 @@ async function boot() {
       e.preventDefault();
       $("#q").focus();
     } else if (e.key === "Escape") {
-      if (!$("#statusModal").hidden) $("#statusModal").hidden = true;
+      if ($(".sidebar").classList.contains("open")) closeDrawer();
+      else if (!$("#statusModal").hidden) $("#statusModal").hidden = true;
       else if (!$("#inspector").hidden && !typing) closeInspector();
     } else if (!typing && e.key === " " && state.audio.active) {
       e.preventDefault();

@@ -592,6 +592,9 @@ button { cursor: pointer; background: none; border: none; }
 
 /* ---------- responsive ---------- */
 
+/* Only shown once the surah column becomes a drawer (see <=900px below). */
+.menu-btn { display: none; }
+
 @media (max-width: 1240px) {
   .workspace.with-inspector { grid-template-columns: 250px minmax(0, 1fr); }
   .inspector {
@@ -609,6 +612,25 @@ button { cursor: pointer; background: none; border: none; }
   .sidebar { display: none; }
   .brand-text p { display: none; }
   .search kbd { display: none; }
+
+  /* The header becomes two rows so the search field keeps its full width. */
+  .top { flex-wrap: wrap; gap: 8px 10px; padding: 10px 12px; }
+  .brand { min-width: 0; flex: 1; }
+  .menu-btn { display: inline-grid; place-items: center; }
+  .search { order: 3; flex: 1 0 100%; max-width: none; }
+
+  /* The surah list becomes a drawer: there is no room for a column, and a
+     phone reader still needs to reach all 114. */
+  .sidebar.open {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: min(330px, 88vw);
+    z-index: 60;
+    box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.45), var(--shadow);
+  }
 }
 
 /* Short laptop viewports: keep the verdict and the source list in reach. */

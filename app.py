@@ -240,7 +240,7 @@ def api_search(q: str = "", limit: int = 40) -> JSONResponse:
             rows = con.execute(
                 "SELECT v.key, v.surah, v.ayah, v.text_verse, v.consensus, s.name_en, "
                 "s.name_ar_short FROM verses v JOIN surahs s ON s.number=v.surah "
-                "WHERE v.search LIKE ? LIMIT ?",
+                "WHERE v.search LIKE ? ORDER BY v.ordinal LIMIT ?",
                 (f"%{arabic_q}%", limit),
             ).fetchall()
             mode = "arabic"
@@ -248,7 +248,8 @@ def api_search(q: str = "", limit: int = 40) -> JSONResponse:
             rows = con.execute(
                 "SELECT v.key, v.surah, v.ayah, v.text_verse, v.consensus, s.name_en, "
                 "s.name_ar_short FROM verses v JOIN surahs s ON s.number=v.surah "
-                "WHERE v.key IN (SELECT verse_key FROM translations WHERE lower(text) LIKE ?) LIMIT ?",
+                "WHERE v.key IN (SELECT verse_key FROM translations WHERE lower(text) LIKE ?) "
+                "ORDER BY v.ordinal LIMIT ?",
                 (f"%{q.lower()}%", limit),
             ).fetchall()
             mode = "translation"

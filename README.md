@@ -74,6 +74,32 @@ The recitation is **not** part of the text verification. Files come from a
 different provider and are matched to verses by ayah number; the checksum and
 cross-source work above says nothing about them.
 
+## Reading it online
+
+`export_static.py` writes the whole reader out as files — no server, no install:
+
+    https://nxgenwidgeter.github.io/bayan/
+
+Every `/api/*` payload is exported once, and `static/site.js` answers the same
+routes from those JSON files in the browser. Nothing is faked: the verse texts,
+the three editions, the diffs and the consensus counts are the build's own
+output, search runs client-side over the same index, and Quran.com and Al Quran
+Cloud are queried live when you press **Re-check live**. Two things a browser
+cannot do without a server, and the web edition says so where it matters:
+
+- re-download tanzil.net — it sends no CORS header, so Tanzil's verdict is the
+  build-time one, labelled "checked at build time" beside its sha256;
+- pull the MP3s into browser storage — the CDN sends no CORS header either, so
+  the web edition streams and offline downloads stay a feature of the local app.
+
+```
+./publish_site.sh          # build dist-site/ and push it to the gh-pages branch
+./export_static.py         # build only, for inspection in dist-site/
+```
+
+The page is one document with no CDN and no build step: it works offline once
+cached by the browser, and it is the same `static/` the local app serves.
+
 ## Layout
 
 ```
@@ -82,7 +108,10 @@ verifier.py           normalisation and comparison rules
 audio.py              per-ayah recitation: download, manifest, local/CDN urls
 download_audio.py     bulk downloader CLI
 app.py                FastAPI service, 127.0.0.1 only
+export_static.py      writes the reader out as a static site (dist-site/)
+publish_site.sh       builds and publishes dist-site/ to the gh-pages branch
 static/               one page, no framework, no CDN
+static/site.js        the /api contract answered from exported JSON, in the browser
 tests/verify_corpus.py  re-derives every claim from the database, then the API
 data/                 bayan.db, raw downloads, audio (rebuildable, not tracked)
 ```
