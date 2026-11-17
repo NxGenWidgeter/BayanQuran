@@ -317,9 +317,15 @@ def main() -> int:
         shutil.copy2(STATIC / name, out / "static" / name)
     shutil.copytree(STATIC / "fonts", out / "static" / "fonts", dirs_exist_ok=True)
 
-    build = hashlib.sha1(
-        f"{VERSION}:{status['built_at']}:{sizes['data/search.json']}".encode()
-    ).hexdigest()[:10]
+    # The query string on static/*.js is the only cache-buster the app has, so it
+    # must change when the code changes — not just when the corpus does. Hashing
+    # the copy actually shipped means a JS-only edit still gets a new URL, and a
+    # returning visitor cannot keep running last week's shim against this data.
+    build_hash = hashlib.sha1(f"{VERSION}:{status['built_at']}".encode())
+    for name in ("site.js", "app.js", "style.css"):
+        build_hash.update((out / "static" / name).read_bytes())
+    build_hash.update(b"search:" + str(sizes["data/search.json"]).encode())
+    build = build_hash.hexdigest()[:10]
     write_index(out, build, args.site_url)
     write_manifest(out)
     (out / ".nojekyll").write_text("", encoding="utf-8")
