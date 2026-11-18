@@ -12,6 +12,14 @@ Runs entirely on this machine. Nothing leaves it except the requests you trigger
 ./run.sh --stop
 ```
 
+Installed as a systemd user unit, so it comes back after a reboot:
+
+```
+systemctl --user status bayan     # active (running) on 127.0.0.1:8150
+curl -s http://127.0.0.1:8150/api/health   # {"ok": true, ...}
+systemctl --user restart bayan    # after a code change
+```
+
 ## What "verified" means here
 
 Every verse is checked at build time against three published Uthmani editions:
@@ -99,6 +107,14 @@ listen rather than search. Open **Kuliah** in the header.
 
 Playback is YouTube's own embed. Nothing is downloaded or re-hosted, the talks stay
 on the channel that published them, and the web edition needs no server for them.
+
+Either file can be absent without taking the app down. `GET /api/guides` loads the
+catalogue non-strictly: it answers `200` with `ok: false` and a `problems` list, plus
+whatever half did load, the panel prints those reasons above the content, and the
+**Kuliah** button hides itself rather than opening a dead end. `export_static.py`
+exports the same partial payload and keeps going. `guides.load()` is still strict by
+default for the CLI and the tests, so a catalogue that has drifted still fails
+`tests/verify_guides.py`.
 
 ```
 python3 tests/verify_guides.py          # catalogue shape: lengths, categories, duplicates
@@ -260,6 +276,11 @@ Nothing here needs an editor to change:
 - **Theme** — dark or light, the ◐ button in the header; the first visit follows
   `prefers-color-scheme`. Stored as `bayan.theme`.
 - **Translation language** — EN / MS, stored as `bayan.lang`.
+- **Arabic text size** — the A− / A+ pair beside the theme toggle, 16–44 px; the
+  leading follows the size. Stored as `bayan.verseSize`, applied through the
+  `--verse-size` / `--verse-lh` variables, in both the reader and the inspector.
+- **Bookmarks** — ☆ on any verse card, **Marked** at the top of the sidebar to list
+  them. Stored as `bayan.marks`, a JSON array of verse keys; nothing leaves the browser.
 - **Reciter** — the four editions listed in the player's select, stored as
   `bayan.reciter`.
 - **Where you were** — last surah and last verse are restored on load
@@ -274,7 +295,6 @@ Nothing here needs an editor to change:
   --remove --skip-existing`.
 - **Static build** — `export_static.py --out --site-url --keep`.
 
-Fixed in code, no knob: Arabic font size and line spacing (`static/style.css`),
-the two translation editions, and the 64 kbps recitation bitrate
-(`audio.py:37`).
+Fixed in code, no knob: the two translation editions, and the 64 kbps recitation
+bitrate (`audio.py:37`).
 

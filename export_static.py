@@ -300,8 +300,18 @@ def main() -> int:
     sizes["data/status.json"] = dump(out / "data/status.json", status)
     sizes["data/audio.json"] = dump(out / "data" / "audio.json", audio_payload())
     # The talks and tutorials are curated files, so they travel as they are:
-    # same payload the local /api/guides returns, no server needed.
-    sizes["data/guides.json"] = dump(out / "data" / "guides.json", guides.load())
+    # same payload the local /api/guides returns, no server needed. A missing
+    # catalogue must not fail the whole export — it ships as ok:false, the web
+    # edition hides the button the same way the local app does, and the build
+    # carries on with the rest of the corpus.
+    guide_payload = guides.load(strict=False)
+    if guide_payload["problems"]:
+        print(
+            "  ! guides incomplete, exporting what exists: "
+            + "; ".join(guide_payload["problems"][:3]),
+            file=sys.stderr,
+        )
+    sizes["data/guides.json"] = dump(out / "data" / "guides.json", guide_payload)
 
     total_verses = 0
     for s in surahs:

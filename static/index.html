@@ -35,6 +35,10 @@
       <button id="statusBtn" class="pill" title="Corpus integrity report">
         <span class="dot ok"></span><span id="statusLabel">checking…</span>
       </button>
+      <div class="seg size-seg" role="group" aria-label="Arabic text size">
+        <button id="verseMinus" title="Smaller Arabic text" aria-label="Smaller Arabic text">A−</button>
+        <button id="versePlus" title="Larger Arabic text" aria-label="Larger Arabic text">A+</button>
+      </div>
       <button id="themeBtn" class="icon" title="Light / dark" aria-label="Toggle theme">◐</button>
     </div>
   </header>
@@ -45,6 +49,10 @@
         <input id="surahFilter" type="search" placeholder="Filter surahs…" autocomplete="off" aria-label="Filter surahs">
         <span class="count" id="surahCount"></span>
       </div>
+      <button id="marksBtn" class="side-marks" aria-pressed="false" title="Show only the verses you bookmarked">
+        <span class="star" aria-hidden="true">☆</span> Marked
+        <span class="count" id="marksCount"></span>
+      </button>
       <nav id="surahList" class="surah-list" aria-label="Surahs"></nav>
     </aside>
 

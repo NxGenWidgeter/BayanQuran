@@ -42,6 +42,10 @@
   --sans: "Inter", "Segoe UI", "Noto Sans", system-ui, sans-serif;
   --arabic: "Amiri Quran", "Noto Naskh Arabic", "Scheherazade New", serif;
   --arabic-ui: "Noto Naskh Arabic", "Noto Kufi Arabic", serif;
+  /* Arabic reading size, set by the A−/A+ pair and remembered in localStorage.
+     The leading rides along: see applyVerseSize() in app.js. */
+  --verse-size: 26px;
+  --verse-lh: 2.05;
 }
 
 html[data-theme="light"] {
@@ -172,6 +176,9 @@ button { cursor: pointer; background: none; border: none; }
 .pill { display: flex; align-items: center; gap: 7px; padding: 6px 11px; font-size: 11.5px; }
 .ghost:hover, .pill:hover, .icon:hover { color: var(--text); border-color: var(--line-strong); }
 .icon { width: 30px; height: 30px; display: grid; place-items: center; font-size: 13px; }
+.size-seg button { padding: 5px 8px; font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.size-seg button + button { border-left: 1px solid var(--line); }
+.size-seg button:disabled { opacity: 0.35; cursor: default; }
 
 .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--faint); flex: none; }
 .dot.ok { background: var(--green); box-shadow: 0 0 0 3px rgba(95, 207, 149, 0.14); }
@@ -215,6 +222,26 @@ button { cursor: pointer; background: none; border: none; }
 .side-head input:focus { border-color: var(--gold); }
 .side-head .count { font-size: 10.5px; color: var(--faint); font-variant-numeric: tabular-nums; }
 
+/* Bookmark list toggle: a row of its own, so it reads as a mode, not a filter. */
+.side-marks {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 12px 2px;
+  padding: 5px 9px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 11.5px;
+  text-align: left;
+}
+.side-marks:hover { color: var(--text); border-color: var(--line-strong); }
+.side-marks.on { color: var(--gold-2); border-color: color-mix(in oklab, var(--gold) 45%, transparent); }
+.side-marks .star { color: var(--gold); font-size: 13px; line-height: 1; }
+.side-marks .count { margin-left: auto; color: var(--faint); font-variant-numeric: tabular-nums; }
+.side-empty { padding: 14px 10px; color: var(--faint); font-size: 11.5px; line-height: 1.5; }
+
 .surah-list { overflow-y: auto; padding: 6px; min-height: 0; }
 .surah-row {
   display: grid;
@@ -227,6 +254,8 @@ button { cursor: pointer; background: none; border: none; }
   position: relative;
 }
 .surah-row:hover { background: var(--hover); }
+.mark-row { grid-template-columns: 54px minmax(0, 1fr); }
+.mark-num { font-size: 10px; padding: 1px 4px; }
 .surah-row.on { background: var(--sel); }
 .surah-row.on::before {
   content: "";
@@ -321,8 +350,8 @@ button { cursor: pointer; background: none; border: none; }
 .verse-top .spacer { flex: 1; }
 .verse-ar {
   font-family: var(--arabic);
-  font-size: 26px;
-  line-height: 2.05;
+  font-size: var(--verse-size);
+  line-height: var(--verse-lh);
   direction: rtl;
   text-align: right;
   color: var(--verse);
@@ -397,8 +426,8 @@ button { cursor: pointer; background: none; border: none; }
 .insp-ref { font-size: 12px; color: var(--gold); letter-spacing: 0.04em; }
 .insp-ar {
   font-family: var(--arabic);
-  font-size: 21px;
-  line-height: 1.95;
+  font-size: calc(var(--verse-size) * 0.81);
+  line-height: var(--verse-lh);
   direction: rtl;
   text-align: right;
   color: var(--verse);
@@ -635,10 +664,10 @@ button { cursor: pointer; background: none; border: none; }
 
 /* Short laptop viewports: keep the verdict and the source list in reach. */
 @media (max-height: 800px) and (min-width: 1241px) {
-  .insp-ar { font-size: 19px; line-height: 1.85; }
+  .insp-ar { font-size: calc(var(--verse-size) * 0.73); line-height: calc(var(--verse-lh) * 0.9); }
   .insp-tr { font-size: 11.5px; line-height: 1.5; }
   .insp-body { padding-top: 12px; }
-  .verse-ar { font-size: 24px; line-height: 1.95; }
+  .verse-ar { font-size: calc(var(--verse-size) * 0.92); line-height: calc(var(--verse-lh) * 0.95); }
 }
 
 /* ---------- surah audio controls ---------- */
@@ -729,6 +758,21 @@ button { cursor: pointer; background: none; border: none; }
 }
 .verse:hover .verse-play, .verse:focus-within .verse-play, .verse.playing .verse-play { opacity: 1; }
 .verse-play:hover { color: var(--gold); background: var(--hover); }
+.verse-mark {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  color: var(--faint);
+  font-size: 13px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  opacity: 0.6;
+  transition: color 0.12s, opacity 0.12s, background 0.12s;
+}
+.verse:hover .verse-mark, .verse:focus-within .verse-mark, .verse-mark.on { opacity: 1; }
+.verse-mark:hover { color: var(--gold); background: var(--hover); }
+.verse-mark.on { color: var(--gold); }
 body.has-player .reader-inner { padding-bottom: 120px; }
 
 @media (max-width: 900px) {
@@ -824,6 +868,15 @@ body.has-player .toast { bottom: 84px; }
 .g-title { font-size: 13px; line-height: 1.45; color: var(--verse); }
 .g-meta { font-size: 11px; color: var(--faint); white-space: nowrap; }
 .g-empty { padding: 22px 18px; color: var(--faint); font-size: 12.5px; }
+/* Partial catalogue: the reasons, in the panel, where the reader is looking. */
+.g-empty.g-warn {
+  color: var(--muted);
+  border-left: 2px solid var(--amber);
+  background: color-mix(in oklab, var(--amber) 6%, transparent);
+  border-radius: 0 8px 8px 0;
+}
+.g-warn ul { margin: 7px 0 0; padding-left: 18px; font-size: 11.5px; color: var(--faint); }
+.g-warn li { margin: 2px 0; }
 
 .g-player { border-bottom: 1px solid var(--line); background: #000; }
 .g-frame { position: relative; width: 100%; aspect-ratio: 16 / 9; max-height: 46vh; }

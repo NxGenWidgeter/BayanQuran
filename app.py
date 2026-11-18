@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import re
 import sqlite3
 import time
@@ -29,6 +30,7 @@ import verifier
 ROOT = Path(__file__).resolve().parent
 DB = ROOT / "data" / "bayan.db"
 STATIC = ROOT / "static"
+VERSION = (ROOT / "VERSION").read_text().strip() if (ROOT / "VERSION").exists() else "0.0.0"
 TANZIL_SHA256 = "ac0724796cbbda0f4801470fbbd11d0f3c5802067bae0493466d0128b0c667af"
 TANZIL_TXT_URL = "https://tanzil.net/pub/download/index.php?quranType=uthmani&outType=txt&agree=true"
 QURAN_COM_AYAH = "https://api.quran.com/api/v4/verses/by_key/{key}?fields=text_uthmani"
@@ -508,13 +510,29 @@ def api_status() -> JSONResponse:
 
 @app.get("/api/guides")
 def api_guides() -> JSONResponse:
-    """The talks and the solat tutorials.
+    """The talks and the solat tutorials, or what is left of them.
 
     Curated files, not scraped: the catalogue records what YouTube reported when
     the videos were picked, and every tutorial sentence names the page it rests
-    on. A broken catalogue is a 500 with the reasons, never a half-filled list.
+    on. A missing or broken file is not a 500 — the loader is called non-strict,
+    so the panel still opens, the payload says ``ok: false`` with every reason,
+    and the header button hides itself. The strict validator stays the default
+    for the CLI and the tests.
     """
-    try:
-        return JSONResponse(guides.load())
-    except ValueError as err:
-        raise HTTPException(500, str(err)) from err
+    payload = guides.load(strict=False)
+    if payload["problems"]:
+        logging.getLogger("uvicorn.error").warning(
+            "guides incomplete: %s", " | ".join(payload["problems"][:5])
+        )
+    return JSONResponse(payload)
+
+
+@app.get("/api/health")
+def api_health() -> dict:
+    """Liveness for supervisors and scripts; /healthz stays the plain-text one."""
+    return {
+        "ok": True,
+        "service": "bayanquran",
+        "version": VERSION,
+        "surahs": 114,
+    }

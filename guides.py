@@ -53,8 +53,16 @@ WATCH = "https://www.youtube.com/watch?v={id}"
 EMBED = "https://www.youtube-nocookie.com/embed/{id}?rel=0&modestbranding=1"
 
 
-def _read(path: Path) -> object:
-    return json.loads(path.read_text(encoding="utf-8"))
+def _read(path: Path, problems: list[str]) -> object:
+    """Best-effort read: an unreadable or malformed file is a reported problem,
+    never an exception. The caller decides whether that is fatal (strict)."""
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except OSError as err:
+        problems.append(f"{path.name} cannot be read: {err}")
+    except json.JSONDecodeError as err:
+        problems.append(f"{path.name} is not valid JSON: {err}")
+    return None
 
 
 def _clean_video(raw: dict, problems: list[str], channel_id: str) -> dict:
@@ -112,7 +120,15 @@ def _clean_solat(raw: dict, problems: list[str]) -> dict:
 
 
 def load(strict: bool = True) -> dict:
-    """-> the payload the UI consumes; raises ValueError when strict and invalid."""
+    """-> the payload the UI consumes; raises ValueError only when strict and invalid.
+
+    ``strict=True`` is for the CLI and the tests: a catalogue that has drifted
+    must fail a build. The HTTP route and the static exporter call
+    ``load(strict=False)`` so an absent or unreadable file degrades to
+    ``ok: false`` plus the reasons and whatever data is actually there, instead
+    of a 500 and a dead panel. The problems are never swallowed — the payload
+    carries them and the UI states them.
+    """
     problems: list[str] = []
 
     if not VIDEOS.exists():
@@ -120,9 +136,14 @@ def load(strict: bool = True) -> dict:
         videos_raw: list[dict] = []
         channel: dict = {}
     else:
-        blob = _read(VIDEOS)
+        blob = _read(VIDEOS, problems)
+        if not isinstance(blob, dict):
+            blob = {}
         channel = blob.get("channel") or {}
         videos_raw = blob.get("videos") or []
+        if not isinstance(videos_raw, list):
+            problems.append("videos must be an array in guides/videos.json")
+            videos_raw = []
         if not channel.get("channel_id"):
             problems.append("channel_id is missing from guides/videos.json")
         if not videos_raw:
@@ -132,6 +153,9 @@ def load(strict: bool = True) -> dict:
     seen: set[str] = set()
     videos: list[dict] = []
     for raw in videos_raw:
+        if not isinstance(raw, dict):
+            problems.append(f"video entry is not an object: {raw!r}"[:160])
+            continue
         video = _clean_video(raw, problems, channel_id)
         if video["id"] in seen:
             problems.append(f"duplicate video id {video['id']}")
@@ -143,15 +167,15 @@ def load(strict: bool = True) -> dict:
 
     if not SOLAT.exists():
         problems.append("guides/solat.json is missing")
-        solat_raw: list[dict] = []
+        solat: list[dict] = []
     else:
-        solat_raw = _read(SOLAT)
+        solat_raw = _read(SOLAT, problems)
         if not isinstance(solat_raw, list):
             problems.append("guides/solat.json must be an array")
             solat_raw = []
-    solat = [_clean_solat(raw, problems) for raw in solat_raw]
-    if [s["id"] for s in solat] != SOLAT_IDS:
-        problems.append(f"solat ids are {[s['id'] for s in solat]}, expected {SOLAT_IDS}")
+        solat = [_clean_solat(raw, problems) for raw in solat_raw if isinstance(raw, dict)]
+        if [s["id"] for s in solat] != SOLAT_IDS:
+            problems.append(f"solat ids are {[s['id'] for s in solat]}, expected {SOLAT_IDS}")
 
     counts = {cid: 0 for cid in CATEGORY_IDS}
     for v in videos:

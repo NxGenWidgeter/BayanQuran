@@ -10,6 +10,8 @@ const state = {
   lang: "en",
   status: null,
   search: { q: "", results: [], mode: null, busy: false },
+  marks: new Set(),          // verse keys bookmarked locally, bayan.marks
+  marksOnly: false,          // sidebar showing the marked list instead of surahs
   suppressHash: false,
   audio: {
     config: null,
@@ -96,6 +98,47 @@ function initTheme() {
   applyTheme(prefersLight ? "light" : "dark");
 }
 
+/* ---------- Arabic text size ---------- */
+
+/* Two knobs, one pair of buttons. The size is what the reader sets; the leading
+   follows it, because larger type needs proportionally less air and smaller type
+   more. Both land as CSS variables so the reader and the inspector stay in step. */
+const VERSE_SIZE_MIN = 16;
+const VERSE_SIZE_MAX = 44;
+const VERSE_SIZE_STEP = 2;
+const VERSE_SIZE_DEFAULT = 26;
+
+function verseSize() {
+  const n = Number(store("bayan.verseSize"));
+  if (!Number.isFinite(n) || n <= 0) return VERSE_SIZE_DEFAULT;
+  return Math.min(VERSE_SIZE_MAX, Math.max(VERSE_SIZE_MIN, Math.round(n)));
+}
+
+function applyVerseSize(px) {
+  px = Math.min(VERSE_SIZE_MAX, Math.max(VERSE_SIZE_MIN, Math.round(px)));
+  const lh = 2.05 + (VERSE_SIZE_DEFAULT - px) * 0.004;
+  document.documentElement.style.setProperty("--verse-size", `${px}px`);
+  document.documentElement.style.setProperty("--verse-lh", String(Math.round(lh * 1000) / 1000));
+  store("bayan.verseSize", String(px));
+  const minus = $("#verseMinus");
+  const plus = $("#versePlus");
+  // The buttons say what they will do next, and stop at the ends of the range.
+  if (minus) {
+    minus.disabled = px <= VERSE_SIZE_MIN;
+    minus.title = `Smaller Arabic text (${px}px)`;
+  }
+  if (plus) {
+    plus.disabled = px >= VERSE_SIZE_MAX;
+    plus.title = `Larger Arabic text (${px}px)`;
+  }
+}
+
+function initVerseSize() {
+  applyVerseSize(verseSize());
+  if ($("#verseMinus")) $("#verseMinus").onclick = () => applyVerseSize(verseSize() - VERSE_SIZE_STEP);
+  if ($("#versePlus")) $("#versePlus").onclick = () => applyVerseSize(verseSize() + VERSE_SIZE_STEP);
+}
+
 function ensureVisible(node) {
   if (!node) return;
   const reader = $(".reader");
@@ -143,10 +186,117 @@ function closeDrawer() {
   $("#menuBtn").setAttribute("aria-expanded", "false");
 }
 
+/* ---------- bookmarks ---------- */
+
+/* One JSON array in localStorage, no server. A mark is just the verse key, so it
+   survives a corpus rebuild as long as the reference still exists. */
+function readMarks() {
+  try {
+    const raw = JSON.parse(store("bayan.marks") || "[]");
+    if (!Array.isArray(raw)) return new Set();
+    return new Set(raw.filter((k) => typeof k === "string" && /^\d{1,3}:\d{1,3}$/.test(k)));
+  } catch {
+    return new Set();  // a corrupted value costs the marks, never the reader
+  }
+}
+
+function writeMarks() {
+  store("bayan.marks", JSON.stringify([...state.marks]));
+}
+
+function paintMarks() {
+  for (const btn of document.querySelectorAll(".verse-mark")) {
+    const on = state.marks.has(btn.dataset.key);
+    btn.textContent = on ? "★" : "☆";
+    btn.classList.toggle("on", on);
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+    btn.title = on ? `Remove bookmark ${btn.dataset.key}` : `Bookmark ${btn.dataset.key}`;
+  }
+  const count = $("#marksCount");
+  if (count) count.textContent = state.marks.size ? String(state.marks.size) : "";
+}
+
+function toggleMark(key) {
+  if (state.marks.has(key)) state.marks.delete(key);
+  else state.marks.add(key);
+  writeMarks();
+  paintMarks();
+  if (state.marksOnly) renderSurahs($("#surahFilter").value);
+  toast(state.marks.has(key) ? `Marked ${key}` : `Removed ${key}`);
+}
+
+function initMarks() {
+  state.marks = readMarks();
+  paintMarks();
+  const btn = $("#marksBtn");
+  if (!btn) return;
+  btn.onclick = () => {
+    state.marksOnly = !state.marksOnly;
+    btn.classList.toggle("on", state.marksOnly);
+    btn.setAttribute("aria-pressed", state.marksOnly ? "true" : "false");
+    renderSurahs($("#surahFilter").value);
+  };
+}
+
+/* The marked list replaces the surah list rather than filtering it: a bookmark
+   is a verse, and a surah row would only say which chapter it is in. */
+function renderMarked(list, filter = "") {
+  const needle = filter.trim().toLowerCase();
+  const keys = [...state.marks].sort((a, b) => {
+    const [as, aa] = a.split(":").map(Number);
+    const [bs, ba] = b.split(":").map(Number);
+    return as - bs || aa - ba;
+  });
+  let shown = 0;
+  for (const key of keys) {
+    const [number, ayah] = key.split(":").map(Number);
+    const s = state.surahs.find((x) => x.number === number);
+    const hay = `${key} ${s ? s.name_en : ""} ${s ? s.meaning : ""}`.toLowerCase();
+    if (needle && !hay.includes(needle)) continue;
+    shown++;
+    const open = () => {
+      loadSurah(number, ayah);
+      closeDrawer();
+    };
+    list.append(el("div", {
+      class: "surah-row mark-row" + (state.surah === number ? " on" : ""),
+      dataset: { key },
+      role: "button",
+      tabindex: "0",
+      onclick: open,
+      onkeydown: (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          open();
+        }
+      },
+    }, [
+      el("span", { class: "surah-num mark-num", text: key }),
+      el("div", {}, [
+        el("div", { class: "surah-names" }, [
+          el("span", { class: "surah-en", text: s ? s.name_en : `Surah ${number}` }),
+        ]),
+        el("div", { class: "surah-sub", text: s ? `${s.meaning} · ${s.revelation}` : "" }),
+      ]),
+    ]));
+  }
+  if (!shown) {
+    list.append(el("div", {
+      class: "side-empty",
+      text: state.marks.size ? "No bookmark matches that filter." : "No bookmarks yet — tap ☆ on any verse.",
+    }));
+  }
+  $("#surahCount").textContent = needle ? `${shown}/${state.marks.size}` : String(state.marks.size);
+}
+
 function renderSurahs(filter = "") {
   const list = $("#surahList");
   const needle = filter.trim().toLowerCase();
   list.replaceChildren();
+  if (state.marksOnly) {
+    renderMarked(list, filter);
+    return;
+  }
   let shown = 0;
   for (const s of state.surahs) {
     const hay = `${s.number} ${s.name_en} ${s.name_ar_short} ${s.meaning}`.toLowerCase();
@@ -227,6 +377,18 @@ function verseCard(v) {
         },
       }),
       el("span", { class: "spacer" }),
+      el("button", {
+        class: "verse-mark" + (state.marks.has(v.key) ? " on" : ""),
+        dataset: { key: v.key },
+        text: state.marks.has(v.key) ? "★" : "☆",
+        title: state.marks.has(v.key) ? `Remove bookmark ${v.key}` : `Bookmark ${v.key}`,
+        "aria-label": `Bookmark verse ${v.key}`,
+        "aria-pressed": state.marks.has(v.key) ? "true" : "false",
+        onclick: (e) => {
+          e.stopPropagation();
+          toggleMark(v.key);
+        },
+      }),
       consensusDots(v.consensus),
     ]),
     el("div", { class: "verse-ar", text: v.text, lang: "ar", dir: "rtl" }),
@@ -1095,6 +1257,20 @@ async function loadGuides() {
   return state.guides.data;
 }
 
+async function initGuides() {
+  const btn = $("#guidesBtn");
+  if (!btn) return;
+  // Probing before the first click means the button never opens a dead end.
+  btn.disabled = true;
+  const data = await loadGuides();
+  if (data && data.ok) {
+    btn.disabled = false;
+    return;
+  }
+  btn.hidden = true;
+  if (data && (data.problems || []).length) console.warn("guides unavailable:", data.problems);
+}
+
 function openGuides(tab) {
   if (tab) state.guides.tab = tab === "solat" ? "solat" : "khutbah";  // #kuliah maps to the khutbah tab
   $("#guidesModal").hidden = false;
@@ -1129,21 +1305,32 @@ async function renderGuides() {
     ]));
     return;
   }
-  body.append(el("div", { class: "g-intro" }, [
-    el("div", {}, [
-      el("strong", { text: data.channel.name }),
-      document.createTextNode(
-        ` · ${data.counts.total} kuliah penuh (${Math.round(data.min_duration_s / 60)} minit ke atas). ` +
-        "Dimainkan melalui pemain rasmi YouTube; tiada video dimuat turun atau disimpan semula."
-      ),
-    ]),
-    el("a", {
-      href: data.channel.url,
-      target: "_blank",
-      rel: "noopener noreferrer",
-      text: "Saluran rasmi ↗",
-    }),
-  ]));
+  // The catalogue can be partial (a file was absent or failed validation). Say
+  // so and show what is there — the alternative was a modal that only said 500.
+  if (data.ok === false) {
+    body.append(el("div", { class: "g-empty g-warn" }, [
+      el("strong", { text: "Sebahagian kandungan tidak dapat dimuatkan. " }),
+      document.createTextNode("Yang ada dipaparkan di bawah."),
+      el("ul", {}, (data.problems || []).map((p) => el("li", { text: p }))),
+    ]));
+  }
+  if (data.channel && data.channel.name) {
+    body.append(el("div", { class: "g-intro" }, [
+      el("div", {}, [
+        el("strong", { text: data.channel.name }),
+        document.createTextNode(
+          ` · ${data.counts.total} kuliah penuh (${Math.round(data.min_duration_s / 60)} minit ke atas). ` +
+          "Dimainkan melalui pemain rasmi YouTube; tiada video dimuat turun atau disimpan semula."
+        ),
+      ]),
+      el("a", {
+        href: data.channel.url,
+        target: "_blank",
+        rel: "noopener noreferrer",
+        text: "Saluran rasmi ↗",
+      }),
+    ]));
+  }
   // The channel's own limit, said where it is read rather than buried in a README:
   // the collection is kuliyyah/ceramah, and no full Friday khutbah is published there.
   if (state.guides.tab === "khutbah" && data.channel.note) {
@@ -1365,6 +1552,8 @@ async function handleHash() {
 
 async function boot() {
   initTheme();
+  initVerseSize();
+  initMarks();
   const savedLang = store("bayan.lang");
   if (savedLang === "ms" || savedLang === "en") state.lang = savedLang;
   for (const btn of document.querySelectorAll("#langSeg button")) {
@@ -1392,6 +1581,7 @@ async function boot() {
       if (e.target.id === "statusModal") $("#statusModal").hidden = true;
     });
     renderSurahs();
+    initGuides();  // probe in the background; hides the button if the catalogue is broken
   } catch (err) {
     $("#statusLabel").textContent = "corpus error";
     $("#readerInner").replaceChildren(el("div", { class: "empty", text: (window.BAYAN_STATIC ? "Cannot load the corpus: " : "Cannot reach the local service: ") + err.message }));
