@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build BayanQuran's verified corpus.
+"""Build Tawatur's verified corpus.
 
 Downloads the Uthmani text from three separately published digitizations, proves
 the Tanzil file against its published SHA-256, checks the whole corpus structure,
@@ -35,7 +35,7 @@ DATA = ROOT / "data"
 RAW = DATA / "raw"
 DB = DATA / "bayan.db"
 
-UA = "BayanQuran/1.0 (local Quran text verifier; +https://tanzil.net)"
+UA = "Tawatur/1.0 (local Quran text verifier; +https://tanzil.net)"
 
 TANZIL_TXT = "https://tanzil.net/pub/download/index.php?quranType=uthmani&outType=txt&agree=true"
 TANZIL_KEYED = "https://tanzil.net/pub/download/index.php?quranType=uthmani&outType=txt-2&agree=true"

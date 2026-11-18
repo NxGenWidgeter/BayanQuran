@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""BayanQuran - a local Quran verse reader that proves every verse.
+"""Tawatur - a local Quran verse reader that proves every verse.
 
 The server is read-only over data/bayan.db, binds to loopback only, and exposes
 one endpoint that re-fetches the three published sources on demand so a reader can
@@ -35,12 +35,12 @@ TANZIL_SHA256 = "ac0724796cbbda0f4801470fbbd11d0f3c5802067bae0493466d0128b0c667a
 TANZIL_TXT_URL = "https://tanzil.net/pub/download/index.php?quranType=uthmani&outType=txt&agree=true"
 QURAN_COM_AYAH = "https://api.quran.com/api/v4/verses/by_key/{key}?fields=text_uthmani"
 ALQURAN_AYAH = "https://api.alquran.cloud/v1/ayah/{key}/quran-uthmani"
-UA = "BayanQuran/1.0 (local Quran text verifier)"
+UA = "Tawatur/1.0 (local Quran text verifier)"
 
 if not DB.exists():
     raise SystemExit("data/bayan.db is missing - run ./build_corpus.py first")
 
-app = FastAPI(title="BayanQuran", docs_url=None, redoc_url=None)
+app = FastAPI(title="Tawatur", docs_url=None, redoc_url=None)
 
 # ---------------------------------------------------------------- plumbing
 
@@ -55,7 +55,7 @@ def connect() -> sqlite3.Connection:
 async def loopback_only(request: Request, call_next):
     host = request.client.host if request.client else ""
     if host not in ("127.0.0.1", "::1", "localhost"):
-        return PlainTextResponse("BayanQuran only answers on loopback.", status_code=403)
+        return PlainTextResponse("Tawatur only answers on loopback.", status_code=403)
     response = await call_next(request)
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
     response.headers.setdefault("Referrer-Policy", "no-referrer")
@@ -532,7 +532,7 @@ def api_health() -> dict:
     """Liveness for supervisors and scripts; /healthz stays the plain-text one."""
     return {
         "ok": True,
-        "service": "bayanquran",
+        "service": "tawatur",
         "version": VERSION,
         "surahs": 114,
     }

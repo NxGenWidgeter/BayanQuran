@@ -1,4 +1,4 @@
-# BayanQuran بيان
+# Tawatur تواتر
 
 A local Quran reader whose point is proof: pick any verse, and the app shows you
 the same verse as published by three separate digitisation projects, compares them
@@ -131,7 +131,7 @@ as an image and no text version could be verified — the card says so and links
 
 `export_static.py` writes the whole reader out as files — no server, no install:
 
-    https://nxgenwidgeter.github.io/BayanQuran/
+    https://nxgenwidgeter.github.io/Tawatur/
 
 Every `/api/*` payload is exported once, and `static/site.js` answers the same
 routes from those JSON files in the browser. Nothing is faked: the verse texts,

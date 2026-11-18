@@ -1,4 +1,4 @@
-/* BayanQuran — reader + verification inspector. No framework, no build step. */
+/* Tawatur — reader + verification inspector. No framework, no build step. */
 
 const $ = (sel, root = document) => root.querySelector(sel);
 

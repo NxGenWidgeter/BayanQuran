@@ -25,7 +25,7 @@ ROOT = Path(__file__).resolve().parent
 DB = ROOT / "data" / "bayan.db"
 AUDIO = ROOT / "data" / "audio"
 CDN = "https://cdn.islamic.network/quran/audio/{bitrate}/{edition}/{number}.mp3"
-UA = "BayanQuran/1.0 (local Quran reader)"
+UA = "Tawatur/1.0 (local Quran reader)"
 
 EDITIONS = {
     "ar.alafasy": {"name": "Mishary Alafasy", "note": "murattal"},
