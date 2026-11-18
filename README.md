@@ -82,11 +82,13 @@ cross-source work above says nothing about them.
 A second, smaller collection lives beside the Quran text, in Malay, for people who
 listen rather than search. Open **Kuliah** in the header.
 
-- `guides/videos.json` — long-form talks from Ustaz Azhar Idrus's official channel
-  (15 minutes and up, so a two-minute clip cannot stand in for a session). What the
+- `guides/videos.json` — 180 long-form talks from Ustaz Azhar Idrus's official channel
+  (15 minutes and up, 312 hours; chosen from 388 verified candidates, keeping every
+  non-kuliyyah item and the most-watched kuliyyah sessions). What the
   channel actually publishes is kuliyyah, ceramah and soal jawab: a channel search for
-  "khutbah jumaat penuh" returns only 1–3 minute clips, so there is no Friday khutbah
-  category with anything in it, and the sheet says so instead of relabelling talks. Each entry
+  "khutbah jumaat penuh" returns only clips — of 78 khutbah-titled videos, the longest
+  is 10 minutes 49 seconds — so there is no Friday khutbah category with anything in it,
+  and the sheet says so instead of relabelling talks. Each entry
   records the title, duration and upload date YouTube reported when it was curated,
   the category it was placed in from its own text, and the channel id, so a re-upload
   channel cannot slip into the collection.
