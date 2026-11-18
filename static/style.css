@@ -743,3 +743,191 @@ body.has-player .toast { bottom: 84px; }
 }
 
 .surah-dl { color: var(--gold); font-size: 9px; margin-left: 5px; opacity: 0.85; }
+
+
+/* ---------- guides: kuliah + solat sunat ---------- */
+
+.modal-card.wide { width: min(980px, 100%); }
+.guides-body { padding: 0; }
+
+.g-tabs { display: flex; gap: 4px; margin-left: 18px; }
+.g-tabs button {
+  padding: 6px 12px;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  color: var(--muted);
+  font-size: 12px;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+.g-tabs button:hover { color: var(--text); }
+.g-tabs button.on { background: var(--panel-2); border-color: var(--line-strong); color: var(--gold); }
+
+.g-intro {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--faint);
+  background: var(--bg-2);
+}
+.g-intro strong { color: var(--text); font-weight: 600; }
+.g-intro a { white-space: nowrap; margin-left: auto; }
+
+.g-toolbar { display: flex; align-items: center; gap: 10px; padding: 14px 18px 8px; }
+.g-search {
+  flex: 1 1 220px;
+  min-width: 0;
+  padding: 8px 11px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg-2);
+  color: var(--text);
+  font-size: 12.5px;
+}
+.g-search:focus { outline: none; border-color: var(--gold); }
+.g-count { font-size: 11px; color: var(--faint); white-space: nowrap; }
+
+.g-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 18px 12px; }
+.g-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--bg-2);
+  color: var(--muted);
+  font-size: 11.5px;
+}
+.g-chip:hover { color: var(--text); border-color: var(--line-strong); }
+.g-chip.on { border-color: var(--gold); color: var(--gold-2); background: var(--sel); }
+.g-chip .n { color: var(--faint); font-size: 10.5px; }
+.g-chip.on .n { color: var(--gold); }
+
+.g-list { display: grid; gap: 1px; padding: 0 12px 18px; }
+.g-item {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 12px;
+  padding: 11px 12px;
+  border-radius: 9px;
+  text-align: left;
+  color: var(--text);
+}
+.g-item:hover { background: var(--hover); }
+.g-item.on { background: var(--sel); }
+.g-cat { font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--faint); }
+.g-title { font-size: 13px; line-height: 1.45; color: var(--verse); }
+.g-meta { font-size: 11px; color: var(--faint); white-space: nowrap; }
+.g-empty { padding: 22px 18px; color: var(--faint); font-size: 12.5px; }
+
+.g-player { border-bottom: 1px solid var(--line); background: #000; }
+.g-frame { position: relative; width: 100%; aspect-ratio: 16 / 9; max-height: 46vh; }
+.g-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.g-pmeta { padding: 11px 18px 13px; background: var(--bg-2); }
+.g-ptitle { font-size: 13px; color: var(--verse); margin-bottom: 6px; }
+.g-prow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 11.5px; }
+.g-prow a { color: var(--gold); }
+.g-x {
+  padding: 4px 9px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.g-x:hover { color: var(--text); border-color: var(--line-strong); }
+.spacer { flex: 1 1 auto; }
+
+.g-lead { margin: 16px 18px 4px; font-size: 12.5px; line-height: 1.65; color: var(--muted); }
+.g-card {
+  margin: 12px 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg-2);
+  overflow: hidden;
+}
+.g-card > summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 13px 15px;
+  cursor: pointer;
+  list-style: none;
+  border-bottom: 1px solid transparent;
+}
+.g-card[open] > summary { border-bottom-color: var(--line); }
+.g-card > summary::-webkit-details-marker { display: none; }
+.g-card-title { font-size: 13.5px; color: var(--verse); font-weight: 600; }
+.g-card-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto; }
+.g-card-chips .tag { font-size: 10.5px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px; }
+.g-card-body { padding: 4px 15px 14px; font-size: 12.5px; line-height: 1.7; color: var(--muted); }
+.g-card-body p { margin: 8px 0; }
+.g-waktu { color: var(--faint); }
+.g-label {
+  margin: 14px 0 6px;
+  font-size: 10px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.g-niat {
+  margin: 10px 0;
+  padding: 11px 13px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--panel);
+}
+.g-ar { font-family: var(--arabic-ui); font-size: 19px; line-height: 2; color: var(--verse); }
+.g-rumi { margin-top: 6px; font-style: italic; color: var(--muted); }
+.g-ms { margin-top: 4px; color: var(--faint); font-size: 12px; }
+.g-note {
+  margin: 10px 0 0;
+  padding: 9px 11px;
+  border-left: 2px solid var(--amber);
+  background: rgba(232, 176, 75, 0.06);
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.g-steps, .g-fadhilat { margin: 4px 0; padding-left: 20px; }
+.g-steps li, .g-fadhilat li { margin: 5px 0; }
+.g-steps strong { color: var(--text); }
+.g-src { display: grid; gap: 8px; }
+.g-src-item { border-top: 1px solid var(--line); padding-top: 8px; }
+.g-src-item a { font-size: 11.5px; }
+.g-src-item blockquote {
+  margin: 5px 0 0;
+  padding-left: 10px;
+  border-left: 2px solid var(--line-strong);
+  color: var(--faint);
+  font-size: 11.5px;
+  line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+  .modal { padding: 0; }
+  .modal-card { width: 100%; max-height: 100vh; height: 100vh; border-radius: 0; border: 0; }
+  .modal-head { flex-wrap: wrap; gap: 8px; }
+  .g-tabs { margin-left: 0; order: 3; width: 100%; }
+  .g-item { grid-template-columns: 1fr; gap: 3px; }
+  .g-meta { white-space: normal; }
+  .g-frame { max-height: 32vh; }
+}
+
+.g-maksud { color: var(--verse); font-size: 12.5px; }
+
+.g-srcnote {
+  margin: 12px 18px 0;
+  padding: 10px 12px;
+  border-left: 2px solid var(--gold);
+  background: var(--sel);
+  font-size: 11.5px;
+  line-height: 1.65;
+  color: var(--muted);
+}
+.g-srcnote strong { color: var(--gold-2); font-weight: 600; }

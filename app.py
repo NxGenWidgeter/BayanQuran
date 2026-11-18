@@ -23,6 +23,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTex
 from fastapi.staticfiles import StaticFiles
 
 import audio
+import guides
 import verifier
 
 ROOT = Path(__file__).resolve().parent
@@ -503,3 +504,17 @@ def api_status() -> JSONResponse:
             "ok": all(c["ok"] for c in checks),
         }
     )
+
+
+@app.get("/api/guides")
+def api_guides() -> JSONResponse:
+    """The talks and the solat tutorials.
+
+    Curated files, not scraped: the catalogue records what YouTube reported when
+    the videos were picked, and every tutorial sentence names the page it rests
+    on. A broken catalogue is a 500 with the reasons, never a half-filled list.
+    """
+    try:
+        return JSONResponse(guides.load())
+    except ValueError as err:
+        raise HTTPException(500, str(err)) from err

@@ -295,6 +295,7 @@
     [/^audio\/config$/, () => apiAudioConfig()],
     [/^audio\/(\d+)$/, (m, q) => apiAudioSurah(m[1], q.get("edition"))],
     [/^audio\/(\d+)\/(status)$/, (m) => apiAudioSurah(m[1])],
+    [/^guides$/, () => load("guides.json")],
   ];
 
   window.fetch = async (input, init = {}) => {

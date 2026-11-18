@@ -1055,6 +1055,276 @@ function downloadTranscript() {
   toast("Transcript saved");
 }
 
+/* ---------- guides: talks + solat sunat ---------- */
+
+/* Curated, not scraped. The list comes from guides/videos.json (long-form only,
+   recorded from YouTube at curation time) and the tutorials from
+   guides/solat.json, where every claim carries the page it rests on. The UI is
+   Malay because the people it is for read Malay. */
+
+const MALAY_MONTHS = ["Jan", "Feb", "Mac", "Apr", "Mei", "Jun", "Jul", "Ogo", "Sep", "Okt", "Nov", "Dis"];
+
+state.guides = { data: null, error: null, tab: "khutbah", cat: "all", q: "", current: null };
+
+function fmtDur(seconds) {
+  if (!seconds) return "";
+  const h = Math.floor(seconds / 3600);
+  const m = Math.round((seconds % 3600) / 60);
+  if (h) return m ? `${h} jam ${m} minit` : `${h} jam`;
+  return `${m} minit`;
+}
+
+function fmtDate(value) {
+  if (!value || !/^\d{8}$/.test(String(value))) return "";
+  const d = String(value);
+  const month = MALAY_MONTHS[Number(d.slice(4, 6)) - 1];
+  return month ? `${Number(d.slice(6, 8))} ${month} ${d.slice(0, 4)}` : "";
+}
+
+function metaLine(v) {
+  return [fmtDur(v.duration_s), fmtDate(v.upload_date)].filter(Boolean).join(" · ");
+}
+
+async function loadGuides() {
+  if (state.guides.data) return state.guides.data;
+  try {
+    state.guides.data = await api("/api/guides");
+  } catch (err) {
+    state.guides.error = err.message;
+  }
+  return state.guides.data;
+}
+
+function openGuides(tab) {
+  if (tab) state.guides.tab = tab === "solat" ? "solat" : "khutbah";  // #kuliah maps to the khutbah tab
+  $("#guidesModal").hidden = false;
+  if (location.hash !== "#" + (state.guides.tab === "solat" ? "solat" : "kuliah")) {
+    setHash(state.guides.tab === "solat" ? "solat" : "kuliah");
+  }
+  renderGuides();
+}
+
+function closeGuides() {
+  $("#guidesModal").hidden = true;
+  setHash(state.surah ? String(state.surah) : "");
+}
+
+function guideTabButton(id) {
+  for (const btn of document.querySelectorAll("#guidesTabs button")) {
+    btn.classList.toggle("on", btn.dataset.gtab === id);
+    btn.setAttribute("aria-selected", btn.dataset.gtab === id ? "true" : "false");
+  }
+}
+
+async function renderGuides() {
+  guideTabButton(state.guides.tab);
+  const body = $("#guidesBody");
+  body.replaceChildren(el("div", { class: "g-empty", text: "Memuatkan…" }));
+  const data = await loadGuides();
+  body.replaceChildren();
+  if (!data) {
+    body.append(el("div", { class: "g-empty" }, [
+      el("strong", { text: "Kandungan ini tidak dapat dimuatkan. " }),
+      state.guides.error || "",
+    ]));
+    return;
+  }
+  body.append(el("div", { class: "g-intro" }, [
+    el("div", {}, [
+      el("strong", { text: data.channel.name }),
+      document.createTextNode(
+        ` · ${data.counts.total} kuliah penuh (${Math.round(data.min_duration_s / 60)} minit ke atas). ` +
+        "Dimainkan melalui pemain rasmi YouTube; tiada video dimuat turun atau disimpan semula."
+      ),
+    ]),
+    el("a", {
+      href: data.channel.url,
+      target: "_blank",
+      rel: "noopener noreferrer",
+      text: "Saluran rasmi ↗",
+    }),
+  ]));
+  // The channel's own limit, said where it is read rather than buried in a README:
+  // the collection is kuliyyah/ceramah, and no full Friday khutbah is published there.
+  if (state.guides.tab === "khutbah" && data.channel.note) {
+    body.append(el("div", { class: "g-srcnote" }, [
+      el("strong", { text: "Nota saluran: " }),
+      data.channel.note,
+    ]));
+  }
+  if (state.guides.tab === "solat") solatTab(body, data);
+  else khutbahTab(body, data);
+}
+
+function embedBlock(v) {
+  return el("div", { class: "g-player" }, [
+    el("div", { class: "g-frame" }, [
+      el("iframe", {
+        src: v.embed,
+        title: v.title,
+        loading: "lazy",
+        allow: "accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen",
+        allowfullscreen: true,
+        referrerpolicy: "strict-origin-when-cross-origin",
+      }),
+    ]),
+    el("div", { class: "g-pmeta" }, [
+      el("div", { class: "g-ptitle", text: v.title }),
+      el("div", { class: "g-prow" }, [
+        el("span", { class: "g-cat", text: v.category_label }),
+        el("span", { class: "g-meta", text: metaLine(v) }),
+        el("span", { class: "spacer" }),
+        el("a", { href: v.url, target: "_blank", rel: "noopener noreferrer", text: "Buka di YouTube ↗" }),
+        el("button", { class: "g-x", text: "Tutup pemain", onclick: () => { state.guides.current = null; renderGuides(); } }),
+      ]),
+    ]),
+  ]);
+}
+
+function khutbahTab(body, data) {
+  if (state.guides.current) body.append(embedBlock(state.guides.current));
+
+  const search = el("input", {
+    type: "search",
+    class: "g-search",
+    placeholder: "Cari tajuk kuliah…",
+    "aria-label": "Cari tajuk kuliah",
+    value: state.guides.q,
+  });
+  const chips = el("div", { class: "g-chips" });
+  const list = el("div", { class: "g-list" });
+  const count = el("span", { class: "g-count" });
+
+  const visible = () => {
+    const needle = state.guides.q.trim().toLowerCase();
+    return data.videos.filter((v) => {
+      if (state.guides.cat !== "all" && v.category !== state.guides.cat) return false;
+      return !needle || v.title.toLowerCase().includes(needle);
+    });
+  };
+
+  const paint = () => {
+    const rows = visible();
+    count.textContent = `${rows.length} daripada ${data.videos.length}`;
+    list.replaceChildren();
+    if (!rows.length) {
+      list.append(el("div", { class: "g-empty", text: "Tiada kuliah yang sepadan. Cuba kategori lain atau padam carian." }));
+      return;
+    }
+    for (const v of rows) {
+      list.append(el("button", {
+        class: "g-item" + (state.guides.current?.id === v.id ? " on" : ""),
+        onclick: () => { state.guides.current = v; renderGuides(); },
+      }, [
+        el("span", { class: "g-cat", text: v.category_label }),
+        el("span", { class: "g-title", text: v.title }),
+        el("span", { class: "g-meta", text: metaLine(v) }),
+      ]));
+    }
+  };
+
+  // Each chip remembers its own element, so the active state is honest.
+  for (const [id, label, n] of [["all", "Semua", data.videos.length], ...data.categories.filter((c) => c.count).map((c) => [c.id, c.label, c.count])]) {
+    const btn = el("button", { class: "g-chip" + (state.guides.cat === id ? " on" : ""), dataset: { cat: id } }, [
+      label,
+      el("span", { class: "n", text: n }),
+    ]);
+    btn.onclick = () => {
+      state.guides.cat = id;
+      for (const b of chips.children) b.classList.toggle("on", b === btn);
+      paint();
+    };
+    chips.append(btn);
+  }
+
+  search.addEventListener("input", (e) => { state.guides.q = e.target.value; paint(); });
+
+  body.append(
+    el("div", { class: "g-toolbar" }, [search, el("span", { class: "spacer" }), count]),
+    chips,
+    list,
+  );
+  paint();
+}
+
+function niatBlock(niat) {
+  // Only the lafaz can honestly be called a "lafaz". When it could not be copied
+  // from a source, the block drops to the meaning and says why — a niat that is
+  // recited is exactly the wrong place to reconstruct text from memory.
+  const hasArabic = Boolean(niat?.ar);
+  const box = el("div", { class: "g-niat" }, [
+    el("div", { class: "g-label", text: hasArabic ? "Lafaz niat" : "Maksud niat" }),
+  ]);
+  if (hasArabic) box.append(el("div", { class: "g-ar", lang: "ar", dir: "rtl", text: niat.ar }));
+  if (niat?.rumi) box.append(el("div", { class: "g-rumi", text: niat.rumi }));
+  if (niat?.ms) box.append(el("div", { class: hasArabic ? "g-ms" : "g-maksud", text: niat.ms }));
+  return box;
+}
+
+function solatCard(t) {
+  const head = el("summary", {}, [
+    el("span", { class: "g-card-title", text: t.nama }),
+    el("span", { class: "g-card-chips" }, [
+      t.hukum ? el("span", { class: "tag", text: t.hukum }) : null,
+      t.rakaat ? el("span", { class: "tag", text: t.rakaat }) : null,
+    ]),
+  ]);
+  const body = el("div", { class: "g-card-body" });
+  if (t.ringkasan) body.append(el("p", { text: t.ringkasan }));
+  if (t.waktu) body.append(el("p", { class: "g-waktu" }, [el("strong", { text: "Waktu: " }), t.waktu]));
+  body.append(niatBlock(t.niat || {}));
+  if ((t.langkah || []).length) {
+    body.append(el("div", { class: "g-label", text: "Cara mengerjakan" }));
+    const ol = el("ol", { class: "g-steps" });
+    for (const s of t.langkah) {
+      ol.append(el("li", {}, [s.tajuk ? el("strong", { text: s.tajuk + " — " }) : null, s.teks || ""]));
+    }
+    body.append(ol);
+  }
+  if ((t.fadhilat || []).length) {
+    body.append(el("div", { class: "g-label", text: "Fadhilat" }));
+    const ul = el("ul", { class: "g-fadhilat" });
+    for (const f of t.fadhilat) ul.append(el("li", { text: f }));
+    body.append(ul);
+  }
+  if (t.nota) body.append(el("div", { class: "g-note", text: t.nota }));
+  if ((t.sumber || []).length) {
+    body.append(el("div", { class: "g-label", text: "Sumber" }));
+    const box = el("div", { class: "g-src" });
+    for (const s of t.sumber) {
+      box.append(el("div", { class: "g-src-item" }, [
+        el("a", { href: s.url, target: "_blank", rel: "noopener noreferrer", text: s.nama || s.url }),
+        s.quote ? el("blockquote", { text: `“${s.quote}”` }) : null,
+      ]));
+    }
+    body.append(box);
+  }
+  return el("details", { class: "g-card", open: true }, [head, body]);
+}
+
+function solatTab(body, data) {
+  body.append(el("p", { class: "g-lead", text:
+    "Empat solat sunat harian: rawatib, dhuha, tahajjud dan witir. Setiap panduan menyebut " +
+    "sumbernya — JAKIM, Pejabat Mufti Wilayah Persekutuan, atau sunnah.com — berserta petikan " +
+    "asal, supaya boleh disemak sendiri. Di mana ulama berbeza pendapat, perbezaan itu " +
+    "dinyatakan, bukan dipilih secara senyap." }));
+  for (const t of data.solat) body.append(solatCard(t));
+  body.append(el("div", { class: "g-note", text: data.sumber_nota }));
+}
+
+/* Wiring lives here rather than in boot() so the panel is optional: if the
+   button or the modal is missing, nothing above runs and the app boots as before. */
+if ($("#guidesBtn") && $("#guidesModal")) {
+  $("#guidesBtn").onclick = () => openGuides();
+  $("#guidesClose").onclick = closeGuides;
+  $("#guidesModal").addEventListener("click", (e) => {
+    if (e.target.id === "guidesModal") closeGuides();
+  });
+  for (const btn of document.querySelectorAll("#guidesTabs button")) {
+    btn.onclick = () => openGuides(btn.dataset.gtab);
+  }
+}
+
 /* ---------- hash routing ---------- */
 
 function setHash(value) {
@@ -1066,6 +1336,7 @@ function setHash(value) {
 function parseHash() {
   const raw = location.hash.replace(/^#\/?/, "");
   if (!raw) return {};
+  if (raw === "kuliah" || raw === "solat") return { guides: raw };  // #kuliah / #solat open the sheet
   const m = raw.match(/^(\d{1,3})(?::(\d{1,3}))?$/);
   if (!m) return {};
   return { surah: Number(m[1]), ayah: m[2] ? Number(m[2]) : null };
@@ -1073,7 +1344,11 @@ function parseHash() {
 
 async function handleHash() {
   if (state.suppressHash) return;
-  const { surah, ayah } = parseHash();
+  const { surah, ayah, guides } = parseHash();
+  if (guides) {
+    openGuides(guides);
+    return;
+  }
   if (!surah) return;
   if (state.search.q) {
     state.search = { q: "", results: [], mode: null, busy: false };
@@ -1157,6 +1432,7 @@ async function boot() {
       $("#q").focus();
     } else if (e.key === "Escape") {
       if ($(".sidebar").classList.contains("open")) closeDrawer();
+      else if (!$("#guidesModal").hidden) closeGuides();
       else if (!$("#statusModal").hidden) $("#statusModal").hidden = true;
       else if (!$("#inspector").hidden && !typing) closeInspector();
     } else if (!typing && e.key === " " && state.audio.active) {
@@ -1181,10 +1457,11 @@ async function boot() {
     toast("Recitation unavailable: " + err.message);
   }
 
-  const { surah: hashSurah, ayah: hashAyah } = parseHash();
+  const { surah: hashSurah, ayah: hashAyah, guides: hashGuides } = parseHash();
   const lastSurah = Number(store("bayan.surah")) || 1;
   const target = hashSurah || lastSurah;
   await loadSurah(target, hashAyah);
+  if (hashGuides) openGuides(hashGuides);
   if (!hashAyah) {
     const lastVerse = store("bayan.verse");
     if (lastVerse && lastVerse.startsWith(`${target}:`)) {

@@ -77,6 +77,38 @@ The recitation is **not** part of the text verification. Files come from a
 different provider and are matched to verses by ayah number; the checksum and
 cross-source work above says nothing about them.
 
+## Kuliah dan panduan solat sunat
+
+A second, smaller collection lives beside the Quran text, in Malay, for people who
+listen rather than search. Open **Kuliah** in the header.
+
+- `guides/videos.json` — long-form talks from Ustaz Azhar Idrus's official channel
+  (15 minutes and up, so a two-minute clip cannot stand in for a session). What the
+  channel actually publishes is kuliyyah, ceramah and soal jawab: a channel search for
+  "khutbah jumaat penuh" returns only 1–3 minute clips, so there is no Friday khutbah
+  category with anything in it, and the sheet says so instead of relabelling talks. Each entry
+  records the title, duration and upload date YouTube reported when it was curated,
+  the category it was placed in from its own text, and the channel id, so a re-upload
+  channel cannot slip into the collection.
+- `guides/solat.json` — four tutorials: rawatib, dhuha, tahajjud, witir. Every claim
+  (rakaat, waktu, hukum, readings, fadhilat) carries the page it rests on and the
+  sentence quoted from it; where the sources allow more than one practice, the
+  difference is stated rather than silently resolved.
+
+Playback is YouTube's own embed. Nothing is downloaded or re-hosted, the talks stay
+on the channel that published them, and the web edition needs no server for them.
+
+```
+python3 tests/verify_guides.py          # catalogue shape: lengths, categories, duplicates
+python3 tests/verify_guides.py --live   # re-fetch every tutorial source, re-check its quote
+```
+
+Stated limits: the video metadata is a snapshot taken at curation time, so a talk the
+channel later removes leaves a dead embed rather than a substituted video; and the
+tutorials are summaries of published rulings with the originals linked, not a
+replacement for a teacher. Arabic niat text is left empty where the source renders it
+as an image and no text version could be verified — the card says so and links out.
+
 ## Reading it online
 
 `export_static.py` writes the whole reader out as files — no server, no install:
@@ -115,7 +147,11 @@ export_static.py      writes the reader out as a static site (dist-site/)
 publish_site.sh       builds and publishes dist-site/ to the gh-pages branch
 static/               one page, no framework, no CDN
 static/site.js        the /api contract answered from exported JSON, in the browser
+guides.py             loads and validates the curated talks + tutorials
+guides/videos.json    long-form talks from the official channel (tracked, not generated)
+guides/solat.json     four sourced solat sunat tutorials
 tests/verify_corpus.py  re-derives every claim from the database, then the API
+tests/verify_guides.py  catalogue shape, and --live re-checks every quoted source
 data/                 bayan.db, raw downloads, audio (rebuildable, not tracked)
 ```
 
@@ -128,6 +164,7 @@ connection.
 | Endpoint | Returns |
 | --- | --- |
 | `GET /api/status` | provenance, totals, variants, integrity checks run now |
+| `GET /api/guides` | curated talks (with embed ids) and the four solat tutorials |
 | `GET /api/surahs` | 114 surahs with names, counts, revelation place |
 | `GET /api/surah/{n}` | verses of one surah with translations |
 | `GET /api/verse/{s}:{a}` | verse, both translations, all three source texts, diffs |
@@ -176,3 +213,66 @@ counts are products of those rules.
 
 `static/fonts/` carries Amiri Quran (SIL Open Font License 1.1, © Khaled Hosny),
 subset by Google Fonts, so the mushaf-style text renders the same everywhere.
+
+## Features
+
+- All 114 surahs and 6,236 verses from one SQLite file, Arabic plus English
+  (Saheeh International) or Malay (Basmeih); the language is a header toggle and
+  is remembered per browser.
+- **The inspector.** Click any verse: the same verse as Tanzil, Quran.com and Al
+  Quran Cloud each print it, with a verdict per edition (`identical`, `same
+  letters`, `differs`), the differing word marked in the edition that differs, and
+  a `3 of 3 agree` badge. The diff is recomputed per request, not replayed from the
+  build (`app.py:195`, `verifier.py:96`).
+- **Re-check live.** One button re-downloads Tanzil's whole 1.3 MB text file and
+  re-hashes it against the published SHA-256 while the two APIs are queried for
+  that verse in parallel. The cached corpus is never consulted for the verdict
+  (`app.py:288`). Measured: 2.4 s for 1:1, 3 of 3.
+- **Search** across Arabic (diacritics, tatweel and hamza carriers ignored, so
+  `الرحمن` finds every vowelling) and across both translations; 40 results, 100 max.
+  Typing `2:255` in the same box jumps straight to the verse (`app.py:231`).
+- **Recitation** in four reciters, one MP3 per ayah — so the verse list is the
+  transcript. Stream it, or download a surah to `data/audio/` and it plays with no
+  network; a ♪ in the sidebar marks what is on disk. Playback runs on past the end
+  of a surah, fading out and into the next.
+- **Transcript** export: any surah's Arabic and translation as a `.txt` file.
+- Copy a verse with its reference and translator, or open it on quran.com.
+- **Integrity report** behind the header pill (`6,234 / 6,236 · 3 sources`): eight
+  build assertions re-run against the database on each page load, with the two
+  2/3 variants and their differing word listed (`/api/status`).
+- Random verse, `#surah:ayah` deep links, and `/` `j` `k` `space` `Esc` for search,
+  verse navigation, playback and closing panels.
+- **Static edition** (`export_static.py`): the same reader as files, with
+  `static/site.js` answering the `/api/*` contract from exported JSON — search and
+  verse inspection run in the browser, the two CORS-friendly APIs are queried live.
+- **In progress, not in 1.3.0:** the Kuliah / solat sunat panel (`guides.py`,
+  `guides/videos.json`, `guides/solat.json`, `GET /api/guides`). It loads 275
+  curated talks and four sourced tutorials and the panel renders both tabs; the
+  files are uncommitted and the catalogue is still being curated, so treat the
+  content as provisional until it is committed.
+
+## Customizability
+
+Nothing here needs an editor to change:
+
+- **Theme** — dark or light, the ◐ button in the header; the first visit follows
+  `prefers-color-scheme`. Stored as `bayan.theme`.
+- **Translation language** — EN / MS, stored as `bayan.lang`.
+- **Reciter** — the four editions listed in the player's select, stored as
+  `bayan.reciter`.
+- **Where you were** — last surah and last verse are restored on load
+  (`bayan.surah`, `bayan.verse`).
+- **Port** — `BAYAN_PORT` (default 8150); `./run.sh`, `./run.sh --open`,
+  `./run.sh --stop`.
+- **Corpus** — `build_corpus.py --refresh` re-downloads everything,
+  `--offline` builds from the cache. The comparison rules live in `verifier.py`;
+  changing them means rebuilding, because the stored flags and consensus counts are
+  that rule's output.
+- **Recitation bulk** — `download_audio.py --edition --surahs --all --list
+  --remove --skip-existing`.
+- **Static build** — `export_static.py --out --site-url --keep`.
+
+Fixed in code, no knob: Arabic font size and line spacing (`static/style.css`),
+the two translation editions, and the 64 kbps recitation bitrate
+(`audio.py:37`).
+

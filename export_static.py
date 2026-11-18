@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Export BayanQuran as a static site: no server, no install, just files.
 
-The local app answers nine JSON endpoints by querying SQLite on every request.
+The local app answers its JSON endpoints by querying SQLite on every request.
 None of that data changes between builds, so the whole API can be written out
 once and served from any static host (GitHub Pages, Cloudflare Pages, a USB
 stick). What cannot survive the trip is anything that needs a process:
@@ -29,6 +29,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import audio
+import guides
 import verifier
 
 ROOT = Path(__file__).resolve().parent
@@ -297,7 +298,10 @@ def main() -> int:
     sizes: dict[str, int] = {}
     sizes["data/surahs.json"] = dump(out / "data/surahs.json", surahs)
     sizes["data/status.json"] = dump(out / "data/status.json", status)
-    sizes["data/audio.json"] = dump(out / "data/audio.json", audio_payload())
+    sizes["data/audio.json"] = dump(out / "data" / "audio.json", audio_payload())
+    # The talks and tutorials are curated files, so they travel as they are:
+    # same payload the local /api/guides returns, no server needed.
+    sizes["data/guides.json"] = dump(out / "data" / "guides.json", guides.load())
 
     total_verses = 0
     for s in surahs:

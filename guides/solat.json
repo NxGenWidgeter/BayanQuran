@@ -1,0 +1,384 @@
+[
+  {
+    "id": "rawatib",
+    "nama": "Solat Sunat Rawatib",
+    "ringkasan": "Solat sunat yang dikerjakan sebelum atau selepas solat fardu lima waktu. Yang dikerjakan sebelum solat fardu dipanggil sunat qabliyah, dan yang dikerjakan selepasnya dipanggil sunat ba'diyah. Ia menjadi penampal kepada kekurangan dalam solat fardu kita, dan sebahagian daripadanya sangat ditekankan oleh syarak.",
+    "hukum": "sunat mu'akkad (ditekankan) dan ghairu mu'akkad (tidak ditekankan)",
+    "rakaat": "10 rakaat mu'akkad, 12 rakaat ghairu mu'akkad (ada riwayat 12 dan 10 rakaat)",
+    "waktu": "Sebelum (qabliyah) atau selepas (ba'diyah) solat fardu. Yang mu'akkad: 2 rakaat sebelum Subuh, 2 atau 4 rakaat sebelum Zohor, 2 rakaat selepas Zohor, 2 rakaat selepas Maghrib, dan 2 rakaat selepas Isyak.",
+    "niat": {
+      "ar": null,
+      "rumi": null,
+      "ms": null
+    },
+    "langkah": [
+      {
+        "tajuk": "Tentukan dulu: qabliyah atau ba'diyah",
+        "teks": "Sebelum mula, tentukan solat ini dibuat sebelum atau selepas solat fardu. Yang sebelum dipanggil qabliyah, yang selepas dipanggil ba'diyah. Ini penting kerana niat di dalam hati mesti mengikut kedudukannya."
+      },
+      {
+        "tajuk": "Kira bilangan rakaat yang anda mahu",
+        "teks": "Yang paling ditekankan (mu'akkad) berjumlah 10 rakaat: 2 sebelum Subuh, 2 atau 4 sebelum Zohor, 2 selepas Zohor, 2 selepas Maghrib, dan 2 selepas Isyak. Jika masih ada tenaga, boleh tambah yang tidak ditekankan (ghairu mu'akkad): 2 rakaat lagi sebelum Zohor, 2 rakaat lagi selepas Zohor, 4 rakaat sebelum Asar, 2 rakaat sebelum Maghrib, dan 2 rakaat sebelum Isyak."
+      },
+      {
+        "tajuk": "Berdiri menghadap kiblat dan berniat di hati",
+        "teks": "Angkat takbiratul ihram. Niat di dalam hati: 'aku solat sunat rawatib qabliyah (atau ba'diyah) dua rakaat kerana Allah Taala'. Niat yang sah ialah niat di dalam hati; melafazkannya dengan lidah hanya digalakkan, bukan syarat."
+      },
+      {
+        "tajuk": "Solat dua rakaat dengan satu salam",
+        "teks": "Setiap dua rakaat diakhiri dengan satu salam, kemudian mulakan pasangan dua rakaat seterusnya. Selepas al-Fatihah, bacalah mana-mana surah yang anda hafal; panduan JAKIM dan al-Kafi yang dirujuk tidak menetapkan surah tertentu untuk rawatib."
+      },
+      {
+        "tajuk": "Rukuk, iktidal, sujud seperti biasa",
+        "teks": "Selepas bacaan, rukuk, bangun iktidal, sujud, duduk antara dua sujud, kemudian sujud kedua. Ulang untuk rakaat kedua, lalu duduk tahiyyat akhir dan beri salam."
+      },
+      {
+        "tajuk": "Akhiri dengan zikir dan doa",
+        "teks": "Selepas salam, berzikir sebentar dan berdoa. Elakkan berhenti terus selepas salam; masa inilah yang baik untuk meminta keperluan diri dan keluarga."
+      }
+    ],
+    "fadhilat": [
+      "Sesiapa yang mengerjakan dua belas rakaat solat sunat dalam sehari semalam, Allah akan membina sebuah rumah untuknya di dalam syurga.",
+      "Solat rawatib menampung kekurangan dalam solat fardu, seperti tidak khusyuk atau tidak menghayati ayat yang dibaca.",
+      "Nabi SAW sendiri menjaga sepuluh rakaat nawafil ini, dan baginda mengerjakan sebahagiannya di rumah."
+    ],
+    "sumber": [
+      {
+        "nama": "AL-KAFI #1029 — Solat Sunat Rawatib Yang Mu'akkad dan Tidak Mu'akkad",
+        "url": "https://www.muftiwp.gov.my/ms/artikel/al-kafi-li-al-fatawi/2993-al-kafi-1029-solat-sunat-rawatib-yang-mu-akkad-dan-tidak-mu-akkad",
+        "quote": "Solat sunat rawatib adalah solat-solat sunat yang didirikan sebelum ataupun sesudah solat fardhu lima waktu."
+      },
+      {
+        "nama": "AL-KAFI #1029 — Solat Sunat Rawatib Yang Mu'akkad dan Tidak Mu'akkad",
+        "url": "https://www.muftiwp.gov.my/ms/artikel/al-kafi-li-al-fatawi/2993-al-kafi-1029-solat-sunat-rawatib-yang-mu-akkad-dan-tidak-mu-akkad",
+        "quote": "Solat rawatib sebelum solat fardhu dikenali sebagai solat sunat qabliyah, manakala solat rawatib yang setelah solat fardhu pula dikenali sebagai solat ba’diyah."
+      },
+      {
+        "nama": "AL-KAFI #1029 — Solat Sunat Rawatib Yang Mu'akkad dan Tidak Mu'akkad",
+        "url": "https://www.muftiwp.gov.my/ms/artikel/al-kafi-li-al-fatawi/2993-al-kafi-1029-solat-sunat-rawatib-yang-mu-akkad-dan-tidak-mu-akkad",
+        "quote": "Solat sunat rawatib ini pula terbahagi kepada mu’akkad (ditekankan) dan ghairu mu’akkad (tidak ditekankan)."
+      },
+      {
+        "nama": "AL-KAFI #1029 — Solat Sunat Rawatib Yang Mu'akkad dan Tidak Mu'akkad",
+        "url": "https://www.muftiwp.gov.my/ms/artikel/al-kafi-li-al-fatawi/2993-al-kafi-1029-solat-sunat-rawatib-yang-mu-akkad-dan-tidak-mu-akkad",
+        "quote": "Tuntasnya, bilangan rakaat solat sunat rawatib yang mu’akkad ialah 10 rakaat, manakala yang tidak mu’akkad pula ialah 12 rakaat sebagaimana yang telah dijelaskan di atas."
+      },
+      {
+        "nama": "AL-KAFI #1029 — Solat Sunat Rawatib Yang Mu'akkad dan Tidak Mu'akkad",
+        "url": "https://www.muftiwp.gov.my/ms/artikel/al-kafi-li-al-fatawi/2993-al-kafi-1029-solat-sunat-rawatib-yang-mu-akkad-dan-tidak-mu-akkad",
+        "quote": "Tidaklah seorang hamba Muslim mengerjakan solat kerana Allah SWT dalam satu hari dua belas rakaat sebagai tathawwu’ dan bukan fardu, melainkan Allah SWT akan membangunkan untuknya sebuah rumah di syurga."
+      },
+      {
+        "nama": "Sahih Muslim 728 — Rumah di syurga bagi 12 rakaat",
+        "url": "https://sunnah.com/muslim:728",
+        "quote": "A house will be built in Paradise, for anyone who prays in a day and a night twelve rak'ahs"
+      },
+      {
+        "nama": "Sahih al-Bukhari 1180 — Sepuluh rakaat nawafil Nabi SAW",
+        "url": "https://sunnah.com/bukhari:1180",
+        "quote": "I remember ten Rakat of Nawafil from the Prophet, two Rakat before the Zuhr prayer and two after it"
+      }
+    ],
+    "nota": "Lafaz niat dalam bahasa Arab tidak disertakan kerana tiada sumber teks yang boleh disalin. Dalam buku Panduan Qiamullail JAKIM, lafaz niat dicetak sebagai imej (tidak boleh dibaca sebagai teks), dan artikel al-Kafi serta Irsyad Hukum di muftiwp.gov.my membincangkan hukum melafazkan niat tanpa mencetak lafaz khusus untuk rawatib. Menurut Irsyad Hukum Siri ke-815, niat yang sah ialah niat di dalam hati; melafazkannya dengan lidah hukumnya mustahab, bukan syarat. Jadi cukuplah berniat di hati: 'aku solat sunat rawatib qabliyah/ba'diyah dua rakaat kerana Allah'.\n\nUlama berbeza pendapat tentang bilangan rakaat mu'akkad. Hadis Ummu Habibah menyebut dua belas rakaat, manakala hadis Ibn Umar menyebut sepuluh rakaat. Al-Kafi #1029 menyelesaikan perbezaan ini dengan menyatakan ulamak Syafi'iyyah memilih 10 rakaat sebagai mu'akkad, dan bakinya (termasuk 2 rakaat tambahan sebelum dan selepas Zohor) sebagai ghairu mu'akkad. Kedua-dua pandangan dipaparkan di sini, tidak dipilih secara senyap."
+  },
+  {
+    "id": "dhuha",
+    "nama": "Solat Sunat Dhuha",
+    "ringkasan": "Solat sunat yang dikerjakan pada waktu pagi, selepas matahari naik dan sebelum matahari tegak di tengah langit. Waktunya tidak panjang, tetapi ia sangat dituntut. Nabi SAW berwasiat kepada Abu Hurairah RA supaya tidak meninggalkan dua rakaat dhuha.",
+    "hukum": "sunat (nafilah) yang dituntut",
+    "rakaat": "2 hingga 12 rakaat; paling afdhal 8 rakaat",
+    "waktu": "Bermula selepas matahari terbit dan berakhir sebelum matahari tegak di tengah langit, iaitu sebelum masuk Zohor. Laman Mufti Pahang menyebut kira-kira 20 minit selepas terbit (setinggi sebatang galah); al-Kafi #1255 menyebut kira-kira 12 hingga 15 minit bagi solat isyraq. Waktu paling afdhal ialah ketika matahari sudah mulai terik.",
+    "niat": {
+      "ar": null,
+      "rumi": null,
+      "ms": "Aku solat sunat Dhuha dua rakaat kerana Allah Taala"
+    },
+    "langkah": [
+      {
+        "tajuk": "Tunggu matahari naik dahulu",
+        "teks": "Jangan solat sebaik sahaja habis Subuh. Tunggu sehingga matahari sudah naik lebih kurang setinggi sebatang galah, kira-kira 20 minit selepas terbit. Selepas itu bolehlah solat sehingga sebelum matahari tegak di tengah langit."
+      },
+      {
+        "tajuk": "Ambil wuduk dan berniat",
+        "teks": "Ambil wuduk, berdiri menghadap kiblat, dan berniat di dalam hati: 'aku solat sunat Dhuha dua rakaat kerana Allah Taala'. Angkat takbiratul ihram."
+      },
+      {
+        "tajuk": "Rakaat pertama",
+        "teks": "Baca al-Fatihah, kemudian pilih satu surah. Antara yang disarankan: Ayat Kursi, atau Surah As-Syams, atau Surah Al-Lail."
+      },
+      {
+        "tajuk": "Rakaat kedua",
+        "teks": "Baca al-Fatihah, kemudian pilih pasangannya: Surah Al-Ikhlas, atau Surah Ad-Dhuha, atau Surah Al-Insyirah. Kemudian rukuk, sujud, dan duduk tahiyyat akhir."
+      },
+      {
+        "tajuk": "Beri salam setiap dua rakaat",
+        "teks": "Habis dua rakaat, beri salam. Jika mahu 4, 6 atau 8 rakaat, ulang pasangan dua rakaat dengan satu salam setiap pasangan. Nabi SAW memberi salam setiap kali selepas dua rakaat, dan baginda mengerjakan lapan rakaat itu berturut-turut."
+      },
+      {
+        "tajuk": "Doa selepas Dhuha",
+        "teks": "Selepas salam, berdoalah. Antara doa yang ringkas dan mudah diingat: 'Allahummaghfir lii wa tub 'alayya, innaka antat tawwabur rahiim' — ertinya: Ya Allah, ampunilah aku dan terimalah taubatku, sesungguhnya Engkau Maha Penerima Taubat lagi Maha Penyayang."
+      }
+    ],
+    "fadhilat": [
+      "Nabi SAW berwasiat tiga perkara kepada Abu Hurairah RA: berpuasa tiga hari setiap bulan, dua rakaat solat dhuha, dan solat witir sebelum tidur.",
+      "Dua rakaat dhuha sudah memadai sebagai sedekah bagi setiap tulang dalam badan kita yang wajib disedekahkan pada pagi hari.",
+      "Jika dikerjakan sejurus selepas duduk berzikir selepas Subuh berjemaah sehingga matahari naik, pahalanya seperti pahala haji dan umrah yang sempurna.",
+      "Solat dhuha yang dikerjakan ketika matahari sudah terik dipanggil solat Awwabin, iaitu solat orang yang sentiasa kembali kepada Allah."
+    ],
+    "sumber": [
+      {
+        "nama": "AL-KAFI #1255 — Waktu Sebenar Solat Sunat Isyraq (edisi kemaskini)",
+        "url": "https://www.muftiwp.gov.my/ms/artikel/al-kafi-li-al-fatawi/3384-al-kafi-1255-waktu-sebenar-solat-sunat-isyraq-edisi-kemaskini",
+        "quote": "Waktu solat Dhuha pula bermula daripada terbitnya matahari (selepas waktu syuruk) sehingga sebelum tergelincir matahari"
+      },
+      {
+        "nama": "AL-KAFI #1255 — Waktu Sebenar Solat Sunat Isyraq (edisi kemaskini)",
+        "url": "https://www.muftiwp.gov.my/ms/artikel/al-kafi-li-al-fatawi/3384-al-kafi-1255-waktu-sebenar-solat-sunat-isyraq-edisi-kemaskini",
+        "quote": "Solat Dhuha boleh dilakukan dengan dua rakaat paling sedikit, kemudian seterusnya empat, enam, lapan sehingga 12 rakaat paling banyak."
+      },
+      {
+        "nama": "AL-KAFI #1641 — Isu Solat Dhuha 8 Rakaat Secara Terpisah",
+        "url": "https://www.muftiwp.gov.my/ms/artikel/al-kafi-li-al-fatawi/4278-al-kafi-1641-isu-solat-dhuha-8-rakaat-secara-terpisah",
+        "quote": "Meskipun begitu, ia tidaklah terhad kepada dua rakaat sahaja, bahkan para fuqaha al-Syafi’eyyah menjelaskan bahawa bilangan rakaat paling afdhal bagi solat dhuha adalah sebanyak 8 rakaat manakala bilangan rakaat paling maksima adalah sebanyak 12 rakaat seperti yang disebutkan oleh Imam Al-Nawawi."
+      },
+      {
+        "nama": "AL-KAFI #1641 — Isu Solat Dhuha 8 Rakaat Secara Terpisah",
+        "url": "https://www.muftiwp.gov.my/ms/artikel/al-kafi-li-al-fatawi/4278-al-kafi-1641-isu-solat-dhuha-8-rakaat-secara-terpisah",
+        "quote": "Kekasihku telah berpesan kepadaku terhadap tiga perkara. (Iaitu) berpuasa sebanyak tiga hari dalam sebulan, dua rakaat solat dhuha, dan supaya aku melakukan solat witir sebelum aku tidur."
+      },
+      {
+        "nama": "AL-KAFI #1255 — Waktu Sebenar Solat Sunat Isyraq (edisi kemaskini)",
+        "url": "https://www.muftiwp.gov.my/ms/artikel/al-kafi-li-al-fatawi/3384-al-kafi-1255-waktu-sebenar-solat-sunat-isyraq-edisi-kemaskini",
+        "quote": "Maka adalah baginya pahala seperti pahala Haji dan Umrah yang sempurna, sempurna, sempurna."
+      },
+      {
+        "nama": "AL-KAFI #1255 — Waktu Sebenar Solat Sunat Isyraq (edisi kemaskini)",
+        "url": "https://www.muftiwp.gov.my/ms/artikel/al-kafi-li-al-fatawi/3384-al-kafi-1255-waktu-sebenar-solat-sunat-isyraq-edisi-kemaskini",
+        "quote": "waktu terbaik untuk solat Dhuha ialah ketika pasir menjadi panas disebabkan matahari sudah mulai terpancar terik"
+      },
+      {
+        "nama": "Sahih Muslim 720 — Dua rakaat Dhuha mencukupi",
+        "url": "https://sunnah.com/muslim:720",
+        "quote": "two rak'ahs which one prays in the forenoon will suffice."
+      },
+      {
+        "nama": "Jabatan Mufti Negeri Pahang — Panduan Solat Sunat Dhuha (salinan arkib 17 Feb 2026)",
+        "url": "https://web.archive.org/web/20260217032849/https://mufti.pahang.gov.my/panduan/panduan-solat-sunat-dhuha",
+        "quote": "Waktunya pada saat matahari telah naik lebih kurang setinggi sebatang galah (kira-kira 20 minit selepas terbit matahari) hinggalah matahari berada tepat di tengah-tengah langit (sebelum menjelang Zuhur)."
+      },
+      {
+        "nama": "Jabatan Mufti Negeri Pahang — Panduan Solat Sunat Dhuha (salinan arkib 17 Feb 2026)",
+        "url": "https://web.archive.org/web/20260217032849/https://mufti.pahang.gov.my/panduan/panduan-solat-sunat-dhuha",
+        "quote": "Lafaz niatnya; “Aku solat sunat Dhuha dua rakaat kerana Allah Taala”"
+      }
+    ],
+    "nota": "Lafaz niat Arab tidak disertakan. Satu-satunya sumber teks yang ditemui (salinan arkib laman Jabatan Mufti Negeri Pahang, 17 Feb 2026) mencetak perkataan selepas «رَكْعَتَينِ» sebagai «اللَّهِ» — tanpa huruf ل — sedangkan lafaz yang lazim ialah «لِلَّهِ», dan ia menulis «تَعَالَي» bukan «تَعَالَى». Kerana niat dibaca, teks yang mungkin salah cetak itu tidak disalin semula; rujuk pautan sumber di bawah atau guru. Yang wajib ialah niat di dalam hati (Irsyad Hukum #815)."
+  },
+  {
+    "id": "tahajjud",
+    "nama": "Solat Sunat Tahajjud",
+    "ringkasan": "Solat sunat yang dikerjakan pada malam hari selepas bangun daripada tidur, walaupun tidurnya hanya sebentar. Waktunya selepas Isyak hingga sebelum fajar, dan yang paling utama pada sepertiga malam yang akhir.",
+    "hukum": "sunat (sembahyang sunat)",
+    "rakaat": "sekurang-kurangnya 2 rakaat, seberapa banyak yang termampu",
+    "waktu": "Selepas Isyak sehingga terbit fajar. Sebaik-baiknya pada satu pertiga malam yang akhir, kira-kira jam 3 pagi, hingga ke fajar.",
+    "niat": {
+      "ar": null,
+      "rumi": null,
+      "ms": "Sahaja aku sembahyang sunat Tahajjud dua rakaat kerana Allah taala."
+    },
+    "langkah": [
+      {
+        "tajuk": "Tidur dahulu, kemudian bangun",
+        "teks": "Tahajjud bererti solat selepas bangun daripada tidur. Jadi tidurlah dahulu selepas Isyak, kemudian bangun pada malam hari. Jika hanya mampu dua rakaat, itu pun sudah dikira qiamullail."
+      },
+      {
+        "tajuk": "Pilih waktu yang paling baik",
+        "teks": "Boleh solat selepas Isyak, tetapi yang paling baik ialah sepertiga malam yang akhir, kira-kira jam 3 pagi, hingga sebelum masuk Subuh. Jika susah bangun jam 3, buatlah pada waktu yang anda mampu; yang penting ia dikerjakan dengan ikhlas dan berterusan."
+      },
+      {
+        "tajuk": "Bangun, ambil wuduk, berniat",
+        "teks": "Bangun, ambil wuduk, menghadap kiblat, dan berniat di dalam hati: 'aku solat sunat Tahajjud dua rakaat kerana Allah Taala'. Angkat takbiratul ihram."
+      },
+      {
+        "tajuk": "Rakaat pertama dan kedua",
+        "teks": "Rakaat pertama: al-Fatihah dan Surah al-Kafirun. Rakaat kedua: al-Fatihah dan Surah al-Ikhlas. Kemudian rukuk, sujud, duduk tahiyyat akhir dan salam."
+      },
+      {
+        "tajuk": "Ulang pasangan dua rakaat",
+        "teks": "Beri salam setiap dua rakaat, kemudian ulangi seberapa banyak yang termampu. Jangan memaksa diri sehingga meninggalkan solat fardu; sederhana tetapi berterusan lebih baik."
+      },
+      {
+        "tajuk": "Doa selepas tahajjud",
+        "teks": "Nabi SAW membaca doa yang panjang selepas bangun untuk tahajjud, bermula dengan 'Allahumma lakal-hamd' — Ya Allah, bagi-Mu segala pujian. Buku panduan JAKIM mencatat doa itu dalam bahasa Melayu. Bacalah dengan tenang, dan sertakan hajat anda sendiri."
+      }
+    ],
+    "fadhilat": [
+      "Allah menjanjikan tempat yang terpuji (maqam mahmud) bagi orang yang mengerjakan tahajjud, seperti dalam Surah al-Isra' ayat 79.",
+      "Orang yang mengerjakan tahajjud mendapat pengawasan Allah, dan kesan ketaatan kelihatan pada wajahnya.",
+      "Wajahnya bersih bersinar dan bercahaya semasa dibangkitkan di padang mahsyar, dan hisabnya dimudahkan.",
+      "Ia melalui Titian Siratul Mustaqim umpama kilat yang menyambar, dan menerima catatan amalannya dengan tangan kanan.",
+      "Ia jauh daripada kebinasaan, dan dikasihi oleh para ahli ibadat serta orang-orang mukmin."
+    ],
+    "sumber": [
+      {
+        "nama": "JAKIM — Panduan Qiamullail (Cet. ke-13, 2013)",
+        "url": "https://www.islam.gov.my/images/ePenerbitan/Panduan_Qiamullail_JAKIM.pdf",
+        "quote": "Pengertian Tahajjud ialah sembahyang sunat apabila terjaga daripada tidur malam walaupun tidur hanya sebentar."
+      },
+      {
+        "nama": "JAKIM — Panduan Qiamullail (Cet. ke-13, 2013)",
+        "url": "https://www.islam.gov.my/images/ePenerbitan/Panduan_Qiamullail_JAKIM.pdf",
+        "quote": "Sembahyang ini dilakukan selepas daripada waktu Isyak sehingga terbit fajar."
+      },
+      {
+        "nama": "JAKIM — Panduan Qiamullail (Cet. ke-13, 2013)",
+        "url": "https://www.islam.gov.my/images/ePenerbitan/Panduan_Qiamullail_JAKIM.pdf",
+        "quote": "Sebaik-baiknya dilakukan pada waktu satu pertiga malam (kira-kira jam 3.00 pagi) hingga ke fajar."
+      },
+      {
+        "nama": "JAKIM — Panduan Qiamullail (Cet. ke-13, 2013)",
+        "url": "https://www.islam.gov.my/images/ePenerbitan/Panduan_Qiamullail_JAKIM.pdf",
+        "quote": "Sembahyang ini dilakukan sekurang-kurangnya dua rakaat secara bersendirian."
+      },
+      {
+        "nama": "JAKIM — Panduan Qiamullail (Cet. ke-13, 2013)",
+        "url": "https://www.islam.gov.my/images/ePenerbitan/Panduan_Qiamullail_JAKIM.pdf",
+        "quote": "Pada rakaat pertama hendaklah baca surah al-Fatihah dan surah al-Kafirun"
+      },
+      {
+        "nama": "JAKIM — Panduan Qiamullail (Cet. ke-13, 2013)",
+        "url": "https://www.islam.gov.my/images/ePenerbitan/Panduan_Qiamullail_JAKIM.pdf",
+        "quote": "Pada rakaat kedua hendaklah baca surah al-Fatihah dan surah al-Ikhlas"
+      },
+      {
+        "nama": "JAKIM — Panduan Qiamullail (Cet. ke-13, 2013)",
+        "url": "https://www.islam.gov.my/images/ePenerbitan/Panduan_Qiamullail_JAKIM.pdf",
+        "quote": "Jika seseorang itu hanya mampu mengerjakan hanya dua rakaat sembahyang Tahajjud sahaja umpamanya, maka ini juga dikira melakukan ibadat qiamullail."
+      },
+      {
+        "nama": "AL-KAFI #793 — Maksud Tahajjud dan Cara Melakukannya",
+        "url": "https://www.muftiwp.gov.my/ms/artikel/al-kafi-li-al-fatawi/2543-al-kafi-793-maksud-tahajjud-dan-cara-melakukannya",
+        "quote": "Dan bangunlah pada sebahagian dari waktu malam serta kerjakanlah"
+      },
+      {
+        "nama": "AL-KAFI #793 — Maksud Tahajjud dan Cara Melakukannya",
+        "url": "https://www.muftiwp.gov.my/ms/artikel/al-kafi-li-al-fatawi/2543-al-kafi-793-maksud-tahajjud-dan-cara-melakukannya",
+        "quote": "Ayat ini bermaksud berjagalah di waktu malam."
+      },
+      {
+        "nama": "Sahih al-Bukhari 1120 — Doa bangun tahajjud",
+        "url": "https://sunnah.com/bukhari:1120",
+        "quote": "When the Prophet (ﷺ) got up at night to offer the Tahajjud prayer, he used to say: Allahumma lakal-hamd."
+      }
+    ],
+    "nota": "Lafaz niat Arab tidak disertakan kerana tiada sumber teks yang boleh disalin: dalam Panduan Qiamullail JAKIM lafaz niat dicetak sebagai imej, dan laman muftiwp.gov.my yang dirujuk tidak mencetak lafaz tahajjud dalam bentuk teks. Yang dicatat di sini hanyalah maksud niat dalam bahasa Melayu, yang memang tercetak dalam buku JAKIM itu. Menurut Irsyad Hukum Siri ke-815, niat di dalam hati itulah yang wajib; lafaz dengan lidah hanya digalakkan.\n\nUlama berbeza pendapat tentang syarat tahajjud. Al-Kafi #793 menyenaraikan tiga cara yang disebut ulama tabi'in: tidur dahulu kemudian solat; solat selepas tidur; dan solat selepas Isyak tanpa tidur. JAKIM memilih pengertian yang pertama (bangun daripada tidur). Bilangan rakaat juga tidak tetap: dalam Sahih Muslim 746, Aisyah RA menceritakan Nabi SAW mengerjakan sembilan rakaat (lapan dan satu), dan apabila baginda tua, tujuh rakaat (enam dan satu) — jumlah keseluruhannya sebelas. Yang penting, tiada had maksimum yang ditetapkan; JAKIM menyebut 'seberapa banyak yang termampu'."
+  },
+  {
+    "id": "witir",
+    "nama": "Solat Sunat Witir",
+    "ringkasan": "Solat sunat penutup solat malam, bilangannya ganjil. Boleh dikerjakan selepas Isyak sehingga sebelum fajar, sama ada bersendirian atau berjemaah. Nabi SAW menjadikannya solat terakhir pada waktu malam.",
+    "hukum": "sunat muakkad",
+    "rakaat": "1 hingga 11 rakaat; tiga rakaat ialah paling kurang sempurna, sebelas rakaat paling sempurna",
+    "waktu": "Selepas solat Isyak sehingga sebelum fajar. Sebaik-baiknya dijadikan solat yang terakhir pada malam itu, sama ada di awal malam selepas Isyak atau di hujung malam selepas tahajjud.",
+    "niat": {
+      "ar": null,
+      "rumi": null,
+      "ms": "Sahaja aku sembahyang sunat Witir dua rakaat kerana Allah Taala."
+    },
+    "langkah": [
+      {
+        "tajuk": "Pilih masa: selepas Isyak atau di hujung malam",
+        "teks": "Witir boleh dikerjakan terus selepas Isyak, atau ditangguhkan ke hujung malam selepas tahajjud. Jika anda bimbang tidak bangun malam, kerjakanlah selepas Isyak — Nabi SAW berwasiat kepada Abu Hurairah RA supaya witir sebelum tidur."
+      },
+      {
+        "tajuk": "Rakaat pertama: Surah al-A'la",
+        "teks": "Berdiri menghadap kiblat, berniat di dalam hati, angkat takbiratul ihram. Baca al-Fatihah, kemudian Surah al-A'la."
+      },
+      {
+        "tajuk": "Rakaat kedua: Surah al-Kafirun",
+        "teks": "Baca al-Fatihah, kemudian Surah al-Kafirun. Jika anda mahu tiga rakaat dua salam, beri salam selepas rakaat kedua ini, kemudian berdiri semula untuk rakaat ketiga."
+      },
+      {
+        "tajuk": "Rakaat ketiga: tiga surah",
+        "teks": "Baca al-Fatihah, kemudian Surah al-Ikhlas, Surah al-Falaq, dan Surah al-Nas. Kemudian rukuk, sujud, duduk tahiyyat akhir."
+      },
+      {
+        "tajuk": "Salam, zikir dan doa witir",
+        "teks": "Beri salam. Selepas itu bacalah zikir dan doa witir seperti yang tercatat dalam buku panduan JAKIM. Jika anda belum menghafalnya, bacalah zikir yang biasa anda amalkan dan berdoa dengan bahasa sendiri."
+      },
+      {
+        "tajuk": "Jangan witir dua kali pada satu malam",
+        "teks": "Jika sudah witir selepas Isyak kemudian bangun tahajjud, jangan ulangi witir. Jika mahu menggenapkan, solatlah satu rakaat dengan niat menggenapkan witir yang awal tadi, kemudian barulah solat sunat yang lain."
+      }
+    ],
+    "fadhilat": [
+      "Witir lebih afdal daripada solat sunat rawatib yang lain, dan para malaikat turut menyaksikan kesungguhan orang yang mengerjakannya.",
+      "Allah itu Witir (Maha Esa) dan suka kepada yang witir, maka Nabi SAW menyuruh ahli al-Quran mengerjakan witir.",
+      "Witir menjadikan solat malam kita ditutup dengan bilangan ganjil, sebagaimana perintah Nabi SAW supaya witir dijadikan solat terakhir pada malam itu.",
+      "Nabi SAW sendiri mengerjakan witir sebelas rakaat, dan apabila baginda tua, tujuh rakaat."
+    ],
+    "sumber": [
+      {
+        "nama": "JAKIM — Panduan Qiamullail (Cet. ke-13, 2013)",
+        "url": "https://www.islam.gov.my/images/ePenerbitan/Panduan_Qiamullail_JAKIM.pdf",
+        "quote": "Witir ertinya ganjil, yakni tidak genap rakaatnya."
+      },
+      {
+        "nama": "JAKIM — Panduan Qiamullail (Cet. ke-13, 2013)",
+        "url": "https://www.islam.gov.my/images/ePenerbitan/Panduan_Qiamullail_JAKIM.pdf",
+        "quote": "Hukumnya sunat muakkad, dikerjakan sekurang-kurangnya satu rakaat dua salam dan sebanyak-banyaknya sebelas rakaat dengan tujuh salam."
+      },
+      {
+        "nama": "JAKIM — Panduan Qiamullail (Cet. ke-13, 2013)",
+        "url": "https://www.islam.gov.my/images/ePenerbitan/Panduan_Qiamullail_JAKIM.pdf",
+        "quote": "Waktunya selepas sembahyang Isyak."
+      },
+      {
+        "nama": "JAKIM — Panduan Qiamullail (Cet. ke-13, 2013)",
+        "url": "https://www.islam.gov.my/images/ePenerbitan/Panduan_Qiamullail_JAKIM.pdf",
+        "quote": "Lebih afdal daripada sunat-sunat rawatib yang lain."
+      },
+      {
+        "nama": "JAKIM — Panduan Qiamullail (Cet. ke-13, 2013)",
+        "url": "https://www.islam.gov.my/images/ePenerbitan/Panduan_Qiamullail_JAKIM.pdf",
+        "quote": "Tidak ada dua witir pada satu malam."
+      },
+      {
+        "nama": "JAKIM — Panduan Qiamullail (Cet. ke-13, 2013)",
+        "url": "https://www.islam.gov.my/images/ePenerbitan/Panduan_Qiamullail_JAKIM.pdf",
+        "quote": "Sembahyang ini boleh dilakukan secara perseorangan atau berjemaah."
+      },
+      {
+        "nama": "AL-KAFI #1393 — Tatacara Solat Witir Yang Afdhal",
+        "url": "https://www.muftiwp.gov.my/ms/artikel/al-kafi-li-al-fatawi/3734-al-kafi-1393-tatacara-solat-witir-yang-afdhal",
+        "quote": "Kami menyatakan bahawa sekurang-kurang solat witir adalah sebanyak satu rakaat, tetapi makruh melakukannya satu rakaat sahaja."
+      },
+      {
+        "nama": "AL-KAFI #1393 — Tatacara Solat Witir Yang Afdhal",
+        "url": "https://www.muftiwp.gov.my/ms/artikel/al-kafi-li-al-fatawi/3734-al-kafi-1393-tatacara-solat-witir-yang-afdhal",
+        "quote": "Sekurang-kurang sempurna solat witir ialah tiga rakaat, iaitu melakukannya secara dua rakaat bersambung dan satu rakaat lagi berasingan."
+      },
+      {
+        "nama": "AL-KAFI #1393 — Tatacara Solat Witir Yang Afdhal",
+        "url": "https://www.muftiwp.gov.my/ms/artikel/al-kafi-li-al-fatawi/3734-al-kafi-1393-tatacara-solat-witir-yang-afdhal",
+        "quote": "Sementara yang paling sempurna adalah melakukannya sebanyak sebelas rakaat dengan mengucap salam selepas setiap dua rakaat dan diakhiri dengan satu rakaat."
+      },
+      {
+        "nama": "AL-KAFI #1393 — Tatacara Solat Witir Yang Afdhal",
+        "url": "https://www.muftiwp.gov.my/ms/artikel/al-kafi-li-al-fatawi/3734-al-kafi-1393-tatacara-solat-witir-yang-afdhal",
+        "quote": "Sebagai kesimpulan kami menyatakan bahawa solat witir yang dilakukan secara tiga rakaat dua salam adalah lebih afdhal berbanding solat witir yang dilakukan secara tiga rakaat satu salam."
+      },
+      {
+        "nama": "Sahih al-Bukhari 998 — Jadikan witir solat terakhir",
+        "url": "https://sunnah.com/bukhari:998",
+        "quote": "Make witr as your last prayer at night."
+      },
+      {
+        "nama": "Sahih Muslim 752 — Witir satu rakaat di akhir malam",
+        "url": "https://sunnah.com/muslim:752",
+        "quote": "Witr is a rak'ah at the end of the prayer."
+      }
+    ],
+    "nota": "Lafaz niat Arab tidak disertakan kerana ia dicetak sebagai imej dalam Panduan Qiamullail JAKIM dan tidak boleh disalin sebagai teks; laman muftiwp.gov.my yang dirujuk juga tidak mencetak lafaz witir dalam bentuk teks. Maksud niat dalam bahasa Melayu di atas memang tercetak dalam buku JAKIM (bagi witir dua rakaat); buku itu juga mencetak maksud bagi witir satu rakaat. Menurut Irsyad Hukum Siri ke-815, niat di hati itulah yang wajib.\n\nAda dua perkara yang ulama berbeza pendapat dan kedua-duanya dipaparkan: (1) bilangan paling sedikit — JAKIM menulis 'sekurang-kurangnya satu rakaat dua salam', manakala al-Kafi #1393 menyatakan satu rakaat dibolehkan tetapi makruh jika bersendirian, dan tiga rakaat (dua bersambung + satu) sebagai paling kurang sempurna; (2) cara tiga rakaat — al-Kafi #1393 menyimpulkan tiga rakaat dua salam lebih afdhal daripada tiga rakaat satu salam, kerana tambah niat, takbir dan salam. JAKIM membenarkan kedua-duanya."
+  }
+]

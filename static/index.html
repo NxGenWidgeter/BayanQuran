@@ -30,6 +30,7 @@
         <button data-lang="en" class="on">EN</button>
         <button data-lang="ms">MS</button>
       </div>
+      <button id="guidesBtn" class="ghost" title="Kuliah, khutbah &amp; panduan solat sunat">Kuliah</button>
       <button id="randomBtn" class="ghost" title="Jump to a random verse">Random</button>
       <button id="statusBtn" class="pill" title="Corpus integrity report">
         <span class="dot ok"></span><span id="statusLabel">checking…</span>
@@ -65,6 +66,20 @@
         <button class="icon" id="statusClose" aria-label="Close">✕</button>
       </div>
       <div id="statusBody" class="modal-body"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="guidesModal" hidden>
+    <div class="modal-card wide" role="dialog" aria-modal="true" aria-labelledby="guidesTitle">
+      <div class="modal-head">
+        <h2 id="guidesTitle">Kuliah &amp; Panduan</h2>
+        <div class="g-tabs" id="guidesTabs" role="tablist">
+          <button data-gtab="khutbah" role="tab" class="on">Kuliah &amp; Ceramah</button>
+          <button data-gtab="solat" role="tab">Solat Sunat</button>
+        </div>
+        <button class="icon" id="guidesClose" aria-label="Tutup">✕</button>
+      </div>
+      <div id="guidesBody" class="modal-body guides-body"></div>
     </div>
   </div>
 
