@@ -20,6 +20,26 @@ curl -s http://127.0.0.1:8150/api/health   # {"ok": true, ...}
 systemctl --user restart bayan    # after a code change
 ```
 
+## Free for anyone
+
+No account, no payment, no ads, no tracking, nothing to install — open the published
+edition and read: <https://nxgenwidgeter.github.io/Tawatur/>
+
+- **Anyone with a browser** uses the static edition: one page plus a few JSON files,
+  no sign-up, nothing stored on a server you don't own.
+- **Reading state stays on the device.** Theme, Arabic text size and bookmarks live in
+  that browser's `localStorage`.
+- **Recitation audio streams** from `cdn.islamic.network`, so it needs a connection;
+  the text itself keeps working offline once a surah is loaded.
+- **The desktop edition** is the same app on `127.0.0.1:8150`, with the whole corpus and
+  an audio cache on disk, loopback only — nothing is exposed to the network.
+- **Touch screens get their own layout.** No hover is assumed: the per-verse listen and
+  bookmark controls are always visible and thumb-sized on a coarse pointer.
+
+The Arabic text is Tanzil's and is reused under its terms — verbatim, credited, linked;
+translations are shown with each translator's name. The in-app Sources panel states both,
+and the full provenance report is in the README section below.
+
 ## What "verified" means here
 
 Every verse is checked at build time against three published Uthmani editions:

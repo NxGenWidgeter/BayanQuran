@@ -851,6 +851,11 @@ function renderStatus() {
     document.createTextNode(" · "),
     el("a", { href: "https://alquran.cloud", target: "_blank", rel: "noopener noreferrer", text: "Al Quran Cloud" }),
   ]));
+  body.append(el("div", { class: "disclaimer" }, [
+    document.createTextNode(
+      "Tawatur is free to use: no account, no payment, no ads, and no tracking of any kind. This published edition needs nothing installed; the desktop edition runs on your own machine and never sends your reading anywhere."
+    ),
+  ]));
 }
 
 /* ---------- recitation + transcript ---------- */

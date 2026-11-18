@@ -775,6 +775,21 @@ button { cursor: pointer; background: none; border: none; }
 .verse-mark.on { color: var(--gold); }
 body.has-player .reader-inner { padding-bottom: 120px; }
 
+/* Touch and narrow screens have no hover: the per-verse controls must be visible on
+   their own, and big enough to hit with a thumb. Desktop keeps the hover-reveal.
+   Width is included because a coarse-pointer media query is not reliably reported
+   by every browser or every emulator, and a 390px window is a phone either way. */
+@media (pointer: coarse), (max-width: 900px) {
+  .verse:hover .verse-play,
+  .verse .verse-play { opacity: 1; }
+  .verse-play,
+  .verse-mark { width: 36px; height: 36px; font-size: 14px; }
+  .verse .verse-head, .verse-head { gap: 6px; }
+  .seg button { min-height: 34px; }
+  .icon { min-width: 34px; min-height: 34px; }
+  .audio-btn.small { min-height: 34px; }
+}
+
 @media (max-width: 900px) {
   .player { grid-template-columns: auto 1fr auto auto; gap: 10px; }
   .p-track, .p-time { display: none; }
